@@ -4,4 +4,4 @@ deployment:
     - export PATH=$PATH:/home/dwfb8160/node/bin
     - npm run build
     - export DEPLOYPATH=/home/dwfb8160/public_html/
-    - /bin/cp -R build/ $DEPLOYPATH
+    - /bin/cp -a build/ $DEPLOYPATH
