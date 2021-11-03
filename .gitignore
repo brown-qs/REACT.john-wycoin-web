@@ -28,3 +28,4 @@ package-lock.json
 .eslintcache
 debug.log
 .env
+.cpanel.yml
