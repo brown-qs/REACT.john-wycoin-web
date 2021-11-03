@@ -1,5 +1,6 @@
 ---
 deployment:
   tasks:
+    - npm run build
     - export DEPLOYPATH=/home/dwfb8160/public_html/
-    - /bin/cp -R build $DEPLOYPATH
+    - /bin/cp -R build/ $DEPLOYPATH
