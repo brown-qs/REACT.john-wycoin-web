@@ -13,8 +13,7 @@ import logolight from "../../assets/images/logo-light.png"
 
 //redux
 import { useSelector, useDispatch } from "react-redux"
-
-import { loginUser, apiError } from "../../store/actions"
+import { loginUser } from "../../store/actions"
 
 const Login2 = props => {
   const dispatch = useDispatch()
@@ -71,7 +70,6 @@ const Login2 = props => {
                             handleValidSubmit(e, v)
                           }}
                         >
-                          {error ? <Alert color="danger">{JSON.stringify(error)}</Alert> : null}
                           <div className="mb-3">
                             <AvField
                               name="username"

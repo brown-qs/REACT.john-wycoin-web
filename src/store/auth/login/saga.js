@@ -4,22 +4,24 @@ import { call, put, takeEvery, takeLatest } from "redux-saga/effects"
 import { LOGIN_USER, LOGOUT_USER, SOCIAL_LOGIN } from "./actionTypes"
 import { apiError, loginSuccess, logoutUserSuccess } from "./actions"
 
-import * as url from "../../../helpers/url_helper"
-
 import { del, get, post } from "../../../helpers/api_helper"
-
-// const fireBaseBackend = getFirebaseBackend()
+import toastr from "toastr"
+import "toastr/build/toastr.min.css"
 
 function* loginUser({ payload: { user, history } }) {
   try {
-    const response = yield call(
-      data => post("login", data),
-      user.email,
-      user.password
-    )
+    const response = yield call(data => post("login", data), {
+      email: user.username,
+      password: user.password,
+    })
     console.log(response)
-    yield put(loginSuccess(response))
-    history.push("/dashboard")
+    if (response.success) {
+      toastr.success("Successfully Logged In!")
+      yield put(loginSuccess(response))
+      history.push("/dashboard")
+    } else {
+      toastr.warning("Wrong Credentials.")
+    }
   } catch (error) {
     yield put(apiError(error))
   }

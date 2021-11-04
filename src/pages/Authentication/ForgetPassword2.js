@@ -10,7 +10,18 @@ import { AvForm, AvField } from "availity-reactstrap-validation"
 import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 
+//redux
+import { useSelector, useDispatch } from "react-redux"
+import { userForgetPassword } from "../../store/actions"
+
 const ForgetPassword2 = props => {
+
+  const dispatch = useDispatch()
+  
+  // handleValidSubmit
+  const handleValidSubmit = (event, values) => {
+    dispatch(userForgetPassword(values, props.history))
+  }
   return (
     <React.Fragment>
       <div>
@@ -59,7 +70,12 @@ const ForgetPassword2 = props => {
                           {props.t("Instructions will be sent to you by email")}
                         </div>
 
-                        <AvForm className="form-horizontal">
+                        <AvForm
+                          className="form-horizontal"
+                          onValidSubmit={(e, v) => {
+                            handleValidSubmit(e, v)
+                          }}
+                        >
                           <div className="mb-3">
                             <AvField
                               name="email"

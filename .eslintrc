@@ -1,6 +1,7 @@
 {
   "rules": {
-    "no-undef": "off"
+    "no-undef": "off",
+    "react/prop-types": 0
   },
   "extends": [
     "plugin:react/recommended"
