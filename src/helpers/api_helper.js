@@ -13,7 +13,7 @@ const axiosApi = axios.create({
   withCredentials: true,
 })
 
-axiosApi.defaults.headers.common["Authorization"] = token
+// axiosApi.defaults.headers.common["Authorization"] = token
 
 axiosApi.interceptors.response.use(
   response => response,
