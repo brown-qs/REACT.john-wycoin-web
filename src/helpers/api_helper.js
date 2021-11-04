@@ -6,7 +6,7 @@ const token = accessToken
 
 //apply base url for axios
 // const API_URL = 'https://api.wycoin.fr/api';
-const API_URL = process.env.API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
 
 const axiosApi = axios.create({
   baseURL: API_URL,
