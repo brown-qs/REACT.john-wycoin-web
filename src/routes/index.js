@@ -34,7 +34,7 @@ const publicRoutes = [
   { path: "/login", component: Login2 },
   { path: "/forgot-password", component: ForgetPassword2 },
   { path: "/confirm-mail", component: ConfirmMail2 },
-  { path: "/reset-password", component: ResetPassword },
+  { path: "/reset-password/:email/:token", component: ResetPassword },
 ]
 
 export { publicRoutes, authProtectedRoutes }

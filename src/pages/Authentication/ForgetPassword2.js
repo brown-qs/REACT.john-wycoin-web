@@ -100,7 +100,7 @@ const ForgetPassword2 = props => {
                           <p>
                             {props.t("Remember it ?")}{" "}
                             <Link
-                              to="pages-login-2"
+                              to="login"
                               className="fw-medium text-primary"
                             >
                               {" "}

@@ -8,6 +8,8 @@ import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 import { Col, Container, Row } from "reactstrap"
 import { Link } from "react-router-dom"
+import Lottie from "react-lottie-player"
+import lottieJson from "../../assets/images/lottie-email-sent.json"
 
 const ConfirmMail2 = props => {
   return (
@@ -42,11 +44,13 @@ const ConfirmMail2 = props => {
                     </div>
                     <div className="my-auto">
                       <div className="text-center">
-                        <div className="avatar-md mx-auto">
-                          <div className="avatar-title rounded-circle bg-light">
-                            <i className="bx bx-mail-send h1 mb-0 text-primary"></i>
-                          </div>
-                        </div>
+                        <Lottie
+                          loop={false}
+                          className="mx-auto"
+                          animationData={lottieJson}
+                          play
+                          style={{ width: 150, height: 150 }}
+                        />
                         <div className="p-2 mt-4">
                           <h4>{props.t("Verify your email")}</h4>
                           <p className="text-muted">

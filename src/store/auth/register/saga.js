@@ -3,36 +3,24 @@ import { takeEvery, fork, put, all, call } from "redux-saga/effects"
 //Account Redux states
 import { REGISTER_USER } from "./actionTypes"
 import { registerUserSuccessful, registerUserFailed } from "./actions"
-
-//Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper"
-import {
-  postFakeRegister,
-  postJwtRegister,
-} from "../../../helpers/fakebackend_helper"
-
-// initialize relavant method of both Auth
-const fireBaseBackend = getFirebaseBackend()
+import { del, get, post } from "../../../helpers/api_helper"
+import toastr from "toastr"
+import "toastr/build/toastr.min.css"
 
 // Is user register successfull then direct plot user in redux.
-function* registerUser({ payload: { user } }) {
+function* registerUser({ payload: { user, history } }) {
   try {
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const response = yield call(
-        fireBaseBackend.registerUser,
-        user.email,
-        user.password
-      )
-      yield put(registerUserSuccessful(response))
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-      const response = yield call(postJwtRegister, "/post-jwt-register", user)
-      yield put(registerUserSuccessful(response))
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
-      const response = yield call(postFakeRegister, user)
-      yield put(registerUserSuccessful(response))
+    const response = yield post("register", user)
+    if (response.success) {
+      history.push("/two-step-verification")
+    } else {
+      for (const group in response.errors) {
+        response.errors[group].map(msg => toastr.warning(msg))
+      }
     }
   } catch (error) {
-    yield put(registerUserFailed(error))
+    console.log(error)
+    toastr.warning("Duplicate Username or Email");
   }
 }
 

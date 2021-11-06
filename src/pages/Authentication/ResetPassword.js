@@ -11,7 +11,20 @@ import { AvForm, AvField } from "availity-reactstrap-validation"
 import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 
+import { useParams } from "react-router-dom"
+import { useSelector, useDispatch } from "react-redux"
+import { userResetPassword } from "../../store/actions"
+
 const ResetPassword = props => {
+  const { email, token } = useParams()
+
+  const dispatch = useDispatch()
+
+  // handleValidSubmit
+  const handleValidSubmit = (event, values) => {
+    dispatch(userResetPassword(values, props.history))
+  }
+
   return (
     <React.Fragment>
       <div>
@@ -53,7 +66,14 @@ const ResetPassword = props => {
                       </div>
 
                       <div className="mt-4">
-                        <AvForm className="form-horizontal">
+                        <AvForm
+                          className="form-horizontal"
+                          onValidSubmit={(e, v) => {
+                            handleValidSubmit(e, v)
+                          }}
+                        >
+                          <AvField type="hidden" name="email" value={email} />
+                          <AvField type="hidden" name="token" value={token} />
                           <div className="mb-3">
                             <AvField
                               name="password"
@@ -66,7 +86,7 @@ const ResetPassword = props => {
                           </div>
                           <div className="mb-3">
                             <AvField
-                              name="repassword"
+                              name="password_confirmation"
                               label={props.t("Repeat password")}
                               className="form-control"
                               placeholder={props.t("Password")}

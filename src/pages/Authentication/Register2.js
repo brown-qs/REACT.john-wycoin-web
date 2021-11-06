@@ -11,7 +11,16 @@ import { AvForm, AvField } from "availity-reactstrap-validation"
 import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 
+import { useSelector, useDispatch } from "react-redux"
+import { registerUser } from "../../store/actions"
+
 const Register2 = props => {
+  const dispatch = useDispatch()
+
+  // handleValidSubmit
+  const handleValidSubmit = (event, values) => {
+    dispatch(registerUser(values, props.history))
+  }
   return (
     <React.Fragment>
       <div>
@@ -50,11 +59,16 @@ const Register2 = props => {
                       </div>
 
                       <div className="mt-4">
-                        <AvForm className="form-horizontal">
+                        <AvForm
+                          className="form-horizontal"
+                          onValidSubmit={(e, v) => {
+                            handleValidSubmit(e, v)
+                          }}
+                        >
                           <Row className="mb-3">
                             <Col xl={6}>
                               <AvField
-                                name="lastname"
+                                name="last_name"
                                 label={props.t("Last name")}
                                 className="form-control"
                                 placeholder={props.t("Last name")}
@@ -64,7 +78,7 @@ const Register2 = props => {
                             </Col>
                             <Col xl={6}>
                               <AvField
-                                name="firstname"
+                                name="first_name"
                                 label={props.t("First name")}
                                 className="form-control"
                                 placeholder={props.t("First name")}
@@ -105,7 +119,7 @@ const Register2 = props => {
                           </div>
                           <div className="mb-3">
                             <AvField
-                              name="repassword"
+                              name="confirm_password"
                               label={props.t("Repeat password")}
                               className="form-control"
                               placeholder={props.t("Password")}
