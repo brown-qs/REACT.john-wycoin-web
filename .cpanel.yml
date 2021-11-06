@@ -2,6 +2,8 @@
 deployment:
   tasks:
     - export PATH=$PATH:/home/dwfb8160/node/bin
+    - npm install
     - npm run build
     - export DEPLOYPATH=/home/dwfb8160/public_html/
+    - /bin/rm $DEPLOYPATH/*
     - /bin/cp -a build/. $DEPLOYPATH
