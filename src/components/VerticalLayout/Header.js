@@ -31,9 +31,7 @@ import dropbox from "../../assets/images/brands/dropbox.png"
 import mail_chimp from "../../assets/images/brands/mail_chimp.png"
 import slack from "../../assets/images/brands/slack.png"
 
-import logo from "../../assets/images/logo.svg"
-import logoLight from "../../assets/images/logo-light.png"
-import logoDark from "../../assets/images/logo-dark.png"
+import favicon from "../../assets/images/favicon.svg"
 
 //i18n
 import { withTranslation } from "react-i18next"
@@ -49,7 +47,7 @@ const Header = props => {
   const [search, setsearch] = useState(false)
   const [megaMenu, setmegaMenu] = useState(false)
   const [socialDrp, setsocialDrp] = useState(false)
-  const [theme, settheme] = useState(true)
+  const [theme, settheme] = useState(localStorage.getItem("theme") != "dark")
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -66,7 +64,13 @@ const Header = props => {
   }
 
   const toggleTheme = () => {
-    settheme(!theme)
+    if (theme) {
+      localStorage.setItem("theme", "dark")
+      location.reload()
+    } else {
+      localStorage.setItem("theme", "light")
+      location.reload()
+    }
   }
 
   function toggleFullscreen() {
@@ -114,13 +118,13 @@ const Header = props => {
             <div className="navbar-brand-box d-lg-none d-md-block">
               <Link to="/" className="logo logo-dark">
                 <span className="logo-sm">
-                  <img src={logoLight} alt="" height="22" />
+                  <img src={favicon} alt="" width="70" />
                 </span>
               </Link>
 
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
-                  <img src={logoDark} alt="" />
+                  <img src={favicon} alt="" width="70" />
                 </span>
               </Link>
             </div>
@@ -191,7 +195,7 @@ const Header = props => {
             <InboxDropdown />
             <NotificationDropdown />
             <ProfileMenu />
-
+            {/* 
             <div
               onClick={toggleTopDrawer}
               disabled={open}
@@ -203,7 +207,7 @@ const Header = props => {
               >
                 <i className="bx bx-cog bx-spin" />
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </header>

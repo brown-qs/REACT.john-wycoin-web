@@ -3,9 +3,9 @@ import MetaTags from "react-meta-tags"
 import { Container } from "reactstrap"
 
 //Import Breadcrumb
-import Breadcrumbs from "../../components/Common/Breadcrumb"
+import Breadcrumbs from "../components/Common/Breadcrumb"
 import { useDispatch } from "react-redux"
-import { getChartsData } from "../../store/actions"
+import { getChartsData } from "../store/actions"
 
 const Dashboard = () => {
   const dispatch = useDispatch()
@@ -16,11 +16,11 @@ const Dashboard = () => {
     <React.Fragment>
       <div className="page-content">
         <MetaTags>
-          <title>Dashboard | WyCoin</title>
+          <title>Portofolio | WyCoin</title>
         </MetaTags>
         <Container fluid>
           {/* Render Breadcrumbs */}
-          <Breadcrumbs title="Dashboard" breadcrumbItem="Starter Page" />
+          <Breadcrumbs title="Portofolio" breadcrumbItem="Page" />
         </Container>
       </div>
     </React.Fragment>

@@ -13,11 +13,13 @@ import ForgetPassword2 from "../pages/Authentication/ForgetPassword2"
 import ConfirmMail2 from "../pages/Authentication/page-confirm-mail-2"
 import ResetPassword from '../pages/Authentication/ResetPassword'
 
-// Dashboard
+// Pages
 import Dashboard from "../pages/Dashboard/index"
+import Portofolio from "../pages/Portofolio"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
+  { path: "/portofolio", component: Portofolio },
 
   // //profile
   { path: "/profile", component: UserProfile },
