@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import MetaTags from "react-meta-tags"
 import PropTypes from "prop-types"
 import { withTranslation } from "react-i18next"
@@ -11,8 +11,19 @@ import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 import { Col, Form, FormGroup, Label, Row } from "reactstrap"
 import { Link } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import { userVerifyEmail } from "../../store/actions"
 
 const TwostepVerification2 = props => {
+  const { email } = useParams()
+  const dispatch = useDispatch()
+  const [code, setCode] = useState(0)
+
+  const handleSubmit = () => {
+    dispatch(userVerifyEmail({ email, code }, props.history))
+  }
+
   return (
     <React.Fragment>
       <div>
@@ -59,7 +70,7 @@ const TwostepVerification2 = props => {
                             )}{" "}
                             :{" "}
                             <span className="font-weight-semibold">
-                              example@abc.com
+                              {email}
                             </span>
                           </p>
 
@@ -88,7 +99,7 @@ const TwostepVerification2 = props => {
                                       textTransform: "uppercase",
                                       borderRadius: ".4rem",
                                     }}
-                                    onChange={() => null}
+                                    onChange={val => setCode(val)}
                                   />
                                 </FormGroup>
                               </Col>
@@ -96,12 +107,12 @@ const TwostepVerification2 = props => {
                           </Form>
 
                           <div className="mt-4">
-                            <Link
-                              to="dashboard"
+                            <button
                               className="btn btn-primary w-100"
+                              onClick={handleSubmit}
                             >
                               {props.t("Confirm")}
-                            </Link>
+                            </button>
                           </div>
                           <div className="mt-5 text-center">
                             <p>

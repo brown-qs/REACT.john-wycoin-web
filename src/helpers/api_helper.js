@@ -23,6 +23,10 @@ axiosApi.interceptors.response.use(
   error => Promise.reject(error)
 )
 
+export function setAuthorizationToken(token) {
+  axiosApi.defaults.headers.common["Authorization"] = "Bearer " + token
+}
+
 export async function get(url, config = {}) {
   return await axiosApi.get(url, { ...config }).then(response => response.data)
 }

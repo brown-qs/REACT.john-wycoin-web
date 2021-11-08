@@ -1,0 +1,16 @@
+export const FORGET_PASSWORD = "FORGET_PASSWORD"
+export const FORGET_PASSWORD_SUCCESS = "FORGET_PASSWORD_SUCCESS"
+export const FORGET_PASSWORD_ERROR = "FORGET_PASSWORD_ERROR"
+export const RESET_PASSWORD = "RESET_PASSWORD"
+export const LOGIN_USER = "LOGIN_USER"
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS"
+
+export const LOGOUT_USER = "LOGOUT_USER"
+export const LOGOUT_USER_SUCCESS = "LOGOUT_USER_SUCCESS"
+export const API_ERROR = "LOGIN_API_ERROR"
+
+export const SOCIAL_LOGIN = "SOCIAL_LOGIN"
+export const REGISTER_USER = "register_user"
+export const REGISTER_USER_SUCCESSFUL = "register_user_successfull"
+export const REGISTER_USER_FAILED = "register_user_failed"
+export const VERIFY_EMAIL = "verify_email"

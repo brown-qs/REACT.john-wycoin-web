@@ -1,42 +1,37 @@
-import { call, put, takeEvery, all, fork } from "redux-saga/effects";
+import { call, put, takeEvery, all, fork } from "redux-saga/effects"
+import { del, get, post } from "../../helpers/api_helper"
 
 // Crypto Redux States
-import { GET_CHARTS_DATA } from "./actionTypes";
-import { apiSuccess, apiFail } from "./actions";
+import { GET_CHARTS_DATA } from "./actionTypes"
+import { apiSuccess, apiFail } from "./actions"
 
 //Include Both Helper File with needed methods
 import {
-    getWeeklyData,
-    getYearlyData,
-    getMonthlyData
-}
-    from "../../helpers/fakebackend_helper";
+  getWeeklyData,
+  getYearlyData,
+  getMonthlyData,
+} from "../../helpers/fakebackend_helper"
 
 function* getChartsData({ payload: periodType }) {
-    try {
-        var response;
-        if (periodType == "monthly") {
-            response = yield call(getWeeklyData, periodType);
-        }
-        if (periodType == "yearly") {
-            response = yield call(getYearlyData, periodType);
-        }
-        if (periodType == "weekly") {
-            response = yield call(getMonthlyData, periodType);
-        }
+  try {
+    const response = yield get("hello")
+    // if (response.success) {
+    //   history.push("/confirm-mail")
+    // }
+    console.log(response)
 
-        yield put(apiSuccess(GET_CHARTS_DATA, response));
-    } catch (error) {
-        yield put(apiFail(GET_CHARTS_DATA, error));
-    }
+    yield put(apiSuccess(GET_CHARTS_DATA, response))
+  } catch (error) {
+    yield put(apiFail(GET_CHARTS_DATA, error))
+  }
 }
 
 export function* watchGetChartsData() {
-    yield takeEvery(GET_CHARTS_DATA, getChartsData);
+  yield takeEvery(GET_CHARTS_DATA, getChartsData)
 }
 
 function* dashboardSaga() {
-    yield all([fork(watchGetChartsData)]);
+  yield all([fork(watchGetChartsData)])
 }
 
-export default dashboardSaga;
+export default dashboardSaga

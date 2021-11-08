@@ -30,7 +30,7 @@ const authProtectedRoutes = [
 const publicRoutes = [
   { path: "/logout", component: Logout },
   { path: "/register", component: Register2 },
-  { path: "/two-step-verification", component: TwostepVerification2 },
+  { path: "/two-step-verification/:email", component: TwostepVerification2 },
   { path: "/login", component: Login2 },
   { path: "/forgot-password", component: ForgetPassword2 },
   { path: "/confirm-mail", component: ConfirmMail2 },

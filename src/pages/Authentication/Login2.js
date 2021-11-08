@@ -12,14 +12,11 @@ import logodark from "../../assets/images/logo-dark.png"
 import logolight from "../../assets/images/logo-light.png"
 
 //redux
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import { loginUser } from "../../store/actions"
 
 const Login2 = props => {
   const dispatch = useDispatch()
-  const { error } = useSelector(state => ({
-    error: state.Login.error,
-  }))
 
   // handleValidSubmit
   const handleValidSubmit = (event, values) => {

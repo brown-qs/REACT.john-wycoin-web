@@ -4,10 +4,7 @@ import { combineReducers } from "redux"
 import Layout from "./layout/reducer"
 
 // Authentication
-import Login from "./auth/login/reducer"
-import Account from "./auth/register/reducer"
-import ForgetPassword from "./auth/forgetpwd/reducer"
-import Profile from "./auth/profile/reducer"
+import Auth from "./auth/reducer"
 
 //E-commerce
 import ecommerce from "./e-commerce/reducer"
@@ -45,10 +42,7 @@ import DashboardSaas from "./dashboard-saas/reducer";
 const rootReducer = combineReducers({
   // public
   Layout,
-  Login,
-  Account,
-  ForgetPassword,
-  Profile,
+  Auth,
   ecommerce,
   calendar,
   chat,

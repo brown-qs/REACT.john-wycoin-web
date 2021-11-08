@@ -118,7 +118,3 @@ const ResetPassword = props => {
 }
 
 export default withTranslation()(ResetPassword)
-
-ResetPassword.propTypes = {
-  t: PropTypes.any,
-}
