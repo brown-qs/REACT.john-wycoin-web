@@ -90,7 +90,6 @@ const Header = props => {
                   <img src={logoDark} alt="" className="w-50" />
                 </span>
               </Link>
-              assa
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
                   <img src={favicon} alt="" />

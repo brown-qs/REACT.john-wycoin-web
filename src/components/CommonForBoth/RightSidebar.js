@@ -14,12 +14,12 @@ import {
   showRightSidebarAction,
 } from "../../store/actions"
 
-//SimpleBar
+//SimpleBar 
 import SimpleBar from "simplebar-react"
 
 import { Link } from "react-router-dom"
 
-import "../../components/CommonForBoth/rightbar.scss"
+// import "../../components/CommonForBoth/rightbar.scss"
 
 //Import images
 import bgimg1 from "../../assets/images/sidebar/img1.jpg"

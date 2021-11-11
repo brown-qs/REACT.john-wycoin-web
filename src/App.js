@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React from "react"
+import React, { lazy, Suspense } from "react"
 
 import { Switch, BrowserRouter as Router } from "react-router-dom"
 import { connect } from "react-redux"
@@ -15,12 +15,10 @@ import VerticalLayout from "./components/VerticalLayout/"
 import HorizontalLayout from "./components/HorizontalLayout/"
 import NonAuthLayout from "./components/NonAuthLayout"
 
+// import LightTheme from "./components/Theme/LightTheme"
+// import DarkTheme from "./components/Theme/DarkTheme"
+
 // Import scss
-import "./assets/scss/theme.scss"
-if (localStorage.getItem("theme") == "dark") {
-  import("./assets/scss/app-dark.scss")
-  import("./assets/scss/bootstrap-dark.scss")
-}
 // Import Firebase Configuration file
 // import { initFirebaseBackend } from "./helpers/firebase_helper"
 

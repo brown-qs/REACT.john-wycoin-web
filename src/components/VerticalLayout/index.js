@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useEffect } from "react"
+import React, { useEffect, Suspense, lazy } from "react"
 
 import { withRouter } from "react-router-dom"
 import {
@@ -55,28 +55,28 @@ const Layout = props => {
   layout  settings
   */
 
-  useEffect(() => {
-    if (isPreloader === true) {
-      document.getElementById("preloader").style.display = "block"
-      document.getElementById("status").style.display = "block"
+  // useEffect(() => {
+  //   if (isPreloader === true) {
+  //     document.getElementById("preloader").style.display = "block"
+  //     document.getElementById("status").style.display = "block"
 
-      setTimeout(function () {
-        document.getElementById("preloader").style.display = "none"
-        document.getElementById("status").style.display = "none"
-      }, 2500)
-    } else {
-      document.getElementById("preloader").style.display = "none"
-      document.getElementById("status").style.display = "none"
-    }
-  }, [isPreloader])
+  //     setTimeout(function () {
+  //       document.getElementById("preloader").style.display = "none"
+  //       document.getElementById("status").style.display = "none"
+  //     }, 2500)
+  //   } else {
+  //     document.getElementById("preloader").style.display = "none"
+  //     document.getElementById("status").style.display = "none"
+  //   }
+  // }, [isPreloader])
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, []);
+  }, [])
 
   useEffect(() => {
-    dispatch(changeLayout("vertical"));
-  }, [dispatch]);
+    dispatch(changeLayout("vertical"))
+  }, [dispatch])
 
   useEffect(() => {
     if (leftSideBarTheme) {
@@ -108,32 +108,45 @@ const Layout = props => {
     }
   }, [topbarTheme, dispatch])
 
+  const Theme = lazy(() =>
+    import(
+      `../Theme/${
+        localStorage.getItem("theme") == "dark" ? "Dark" : "Light"
+      }Theme`
+    )
+  )
+
   return (
     <React.Fragment>
-      <div id="preloader">
-        <div id="status">
-          <div className="spinner-chase">
-            <div className="chase-dot" />
-            <div className="chase-dot" />
-            <div className="chase-dot" />
-            <div className="chase-dot" />
-            <div className="chase-dot" />
-            <div className="chase-dot" />
+      <Suspense
+        fallback={
+          <div id="preloader">
+            <div id="status">
+              <div className="spinner-chase">
+                <div className="chase-dot" />
+                <div className="chase-dot" />
+                <div className="chase-dot" />
+                <div className="chase-dot" />
+                <div className="chase-dot" />
+                <div className="chase-dot" />
+              </div>
+            </div>
           </div>
+        }
+      >
+        <Theme />
+        <div id="layout-wrapper">
+          <Header toggleMenuCallback={toggleMenuCallback} />
+          <Sidebar
+            theme={leftSideBarTheme}
+            type={leftSideBarType}
+            isMobile={isMobile}
+          />
+          <div className="main-content">{props.children}</div>
+          <Footer />
         </div>
-      </div>
-
-      <div id="layout-wrapper">
-        <Header toggleMenuCallback={toggleMenuCallback} />
-        <Sidebar
-          theme={leftSideBarTheme}
-          type={leftSideBarType}
-          isMobile={isMobile}
-        />
-        <div className="main-content">{props.children}</div>
-        <Footer />
-      </div>
-      {showRightSidebar ? <Rightbar /> : null}
+        {showRightSidebar ? <Rightbar /> : null}
+      </Suspense>
     </React.Fragment>
   )
 }
