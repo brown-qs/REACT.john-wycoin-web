@@ -48,7 +48,7 @@ const NotificationDropdown = props => {
           </div>
 
           <SimpleBar style={{ height: "230px" }}>
-            <Link to="" className="text-reset notification-item">
+          {/* <Link to="" className="text-reset notification-item">
               <div className="media">
                 <div className="avatar-xs me-3">
                   <span className="avatar-title bg-primary rounded-circle font-size-16">
@@ -138,7 +138,7 @@ const NotificationDropdown = props => {
                   </div>
                 </div>
               </div>
-            </Link>
+            </Link> */}
           </SimpleBar>
           <div className="p-2 border-top d-grid">
             <Link

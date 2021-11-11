@@ -25,6 +25,7 @@ const initialState = {
   user: null,
   success: null,
   error: null,
+  Profile: null,
 }
 
 const auth = (state = initialState, action) => {

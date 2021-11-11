@@ -15,9 +15,8 @@ import { useSelector, useDispatch } from "react-redux"
 import { userForgetPassword } from "../../store/actions"
 
 const ForgetPassword2 = props => {
-
   const dispatch = useDispatch()
-  
+
   // handleValidSubmit
   const handleValidSubmit = (event, values) => {
     dispatch(userForgetPassword(values, props.history))
@@ -38,21 +37,21 @@ const ForgetPassword2 = props => {
               <div className="auth-full-page-content p-md-5 p-4">
                 <div className="w-100">
                   <div className="d-flex flex-column h-100">
-                    <div className="mb-4 mb-md-5">
-                      <Link to="dashboard" className="d-block auth-logo">
-                        <img
-                          src={logodark}
-                          alt=""
-                          className="auth-logo-dark img-fluid"
-                        />
-                        <img
-                          src={logolight}
-                          alt=""
-                          className="auth-logo-light img-fluid"
-                        />
-                      </Link>
-                    </div>
                     <div className="my-auto">
+                      <div className="mb-4 mb-md-5">
+                        <Link to="/dashboard" className="d-block auth-logo">
+                          <img
+                            src={logodark}
+                            alt=""
+                            className="auth-logo-dark img-fluid"
+                          />
+                          <img
+                            src={logolight}
+                            alt=""
+                            className="auth-logo-light img-fluid"
+                          />
+                        </Link>
+                      </div>
                       <div>
                         <h5 className="text-primary">
                           {props.t("Reset Password")}
@@ -99,10 +98,7 @@ const ForgetPassword2 = props => {
                         <div className="mt-5 text-center">
                           <p>
                             {props.t("Remember it ?")}{" "}
-                            <Link
-                              to="login"
-                              className="fw-medium text-primary"
-                            >
+                            <Link to="/login" className="fw-medium text-primary">
                               {" "}
                               {props.t("Login")}{" "}
                             </Link>{" "}

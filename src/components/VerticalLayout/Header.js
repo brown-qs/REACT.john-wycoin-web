@@ -47,7 +47,7 @@ const Header = props => {
   const [search, setsearch] = useState(false)
   const [megaMenu, setmegaMenu] = useState(false)
   const [socialDrp, setsocialDrp] = useState(false)
-  const [theme, settheme] = useState(localStorage.getItem("theme") != "dark")
+  const [theme, settheme] = useState(0)
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
@@ -64,7 +64,7 @@ const Header = props => {
   }
 
   const toggleTheme = () => {
-    if (theme) {
+    if (localStorage.getItem("theme") != "dark") {
       localStorage.setItem("theme", "dark")
       location.reload()
     } else {
@@ -159,7 +159,7 @@ const Header = props => {
                 className="btn header-item noti-icon "
                 data-toggle="fullscreen"
               >
-                <i className={theme ? "bx bx-sun" : "bx bxs-moon"} />
+                <i className={localStorage.getItem("theme") == "dark" ? "bx bx-moon" : "bx bxs-sun"} />
               </button>
             </div>{" "}
           </div>
@@ -174,7 +174,7 @@ const Header = props => {
               {" "}
               {props.t("USD")} <i className="mdi mdi-chevron-down" />
             </DropdownToggle>
-            <DropdownMenu className="">
+            <DropdownMenu style={{minWidth: 'auto'}}>
               <DropdownItem
                 onClick={() => settheme(0)}
                 className={`${theme === 0 ? "active" : "none"}`}

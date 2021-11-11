@@ -23,7 +23,7 @@ const Sidebar = props => {
               <img src={favicon} alt="" height="22" />
             </span>
             <span className="logo-lg">
-              <img src={logoDark} alt="" className="w-50" />
+              <img src={logoDark} alt="" width="125" />
             </span>
           </Link>
           <Link to="/" className="logo logo-light">
@@ -31,7 +31,7 @@ const Sidebar = props => {
               <img src={favicon} alt="" />
             </span>
             <span className="logo-lg">
-              <img src={logoLight} alt="" className="w-50" />
+              <img src={logoLight} alt="" width="125" />
             </span>
           </Link>
         </div>

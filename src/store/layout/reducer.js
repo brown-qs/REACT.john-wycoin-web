@@ -25,7 +25,7 @@ import {
 const INIT_STATE = {
   layoutType: layoutTypes.VERTICAL,
   layoutWidth: layoutWidthTypes.FLUID,
-  leftSideBarTheme: leftSideBarThemeTypes.DARK,
+  leftSideBarTheme: localStorage.getItem('theme') == 'dark' ? leftSideBarThemeTypes.DARK : leftSideBarThemeTypes.LIGHT,
   leftSideBarThemeImage: leftBarThemeImageTypes.NONE,
   leftSideBarType: leftSidebarTypes.DEFAULT,
   topbarTheme: topBarThemeTypes.LIGHT,

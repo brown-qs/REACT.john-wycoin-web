@@ -5,7 +5,12 @@ import { withTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { Col, Container, Form, Row } from "reactstrap"
 
-import { AvForm, AvField } from "availity-reactstrap-validation"
+import {
+  AvForm,
+  AvField,
+  AvRadioGroup,
+  AvRadio,
+} from "availity-reactstrap-validation"
 
 // import images
 import logodark from "../../assets/images/logo-dark.png"
@@ -13,12 +18,12 @@ import logolight from "../../assets/images/logo-light.png"
 
 import { useSelector, useDispatch } from "react-redux"
 import { registerUser } from "../../store/actions"
-
 const Register2 = props => {
   const dispatch = useDispatch()
 
   // handleValidSubmit
   const handleValidSubmit = (event, values) => {
+    console.log(values)
     dispatch(registerUser(values, props.history))
   }
   return (
@@ -36,21 +41,21 @@ const Register2 = props => {
               <div className="auth-full-page-content p-md-5 p-4">
                 <div className="w-100">
                   <div className="d-flex flex-column h-100">
-                    <div className="mb-4 mb-md-5">
-                      <Link to="dashboard" className="d-block auth-logo">
-                        <img
-                          src={logodark}
-                          alt=""
-                          className="auth-logo-dark img-fluid"
-                        />
-                        <img
-                          src={logolight}
-                          alt=""
-                          className="auth-logo-light img-fluid"
-                        />
-                      </Link>
-                    </div>
                     <div className="my-auto">
+                      <div className="mb-4 mb-md-5">
+                        <Link to="/dashboard" className="d-block auth-logo">
+                          <img
+                            src={logodark}
+                            alt=""
+                            className="auth-logo-dark img-fluid"
+                          />
+                          <img
+                            src={logolight}
+                            alt=""
+                            className="auth-logo-light img-fluid"
+                          />
+                        </Link>
+                      </div>
                       <div>
                         <h5 className="text-primary">{props.t("Welcome!")}</h5>
                         <p className="text-muted">
@@ -85,6 +90,15 @@ const Register2 = props => {
                                 type="text"
                                 required
                               />
+                            </Col>
+                          </Row>
+                          <Row className="mb-3">
+                            <Col xl={12}>
+                              <label>Gender</label> <br />
+                              <AvRadioGroup inline name="gender" required>
+                                <AvRadio label="Male" value="0" />
+                                <AvRadio label="Female" value="1" />
+                              </AvRadioGroup>
                             </Col>
                           </Row>
                           <div className="mb-3">
@@ -150,7 +164,7 @@ const Register2 = props => {
                           <p>
                             {props.t("Already have an account?")}
                             <Link
-                              to="login"
+                              to="/login"
                               className="font-weight-medium text-primary"
                             >
                               {" "}

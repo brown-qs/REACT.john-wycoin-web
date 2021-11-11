@@ -14,13 +14,15 @@ import { connect } from "react-redux"
 import { withRouter, Link } from "react-router-dom"
 
 // users
-import user1 from "../../../assets/images/users/avatar-1.jpg"
+import avatarMale from "../../../assets/images/users/avatar-man.jpg"
+import avatarFemale from "../../../assets/images/users/avatar-woman.jpg"
 
 const ProfileMenu = props => {
   // Declare a new state variable, which we'll call "menu"
   const [menu, setMenu] = useState(false)
 
   const [username, setusername] = useState("Admin")
+  console.log(props.Profile)
 
   useEffect(() => {
     if (localStorage.getItem("authUser")) {
@@ -51,7 +53,7 @@ const ProfileMenu = props => {
         >
           <img
             className="rounded-circle header-profile-user"
-            src={user1}
+            src={props.Profile.gender == 0 ? avatarMale : avatarFemale}
             alt="Header Avatar"
           />
           {/* <span className="d-none d-xl-inline-block ms-2 me-1">{username}</span> */}
@@ -62,19 +64,6 @@ const ProfileMenu = props => {
             {" "}
             <i className="bx bx-user font-size-16 align-middle me-1"/>
             {props.t("Profile")}{" "}
-          </DropdownItem>
-          <DropdownItem tag="a" href="/crypto-wallet">
-            <i className="bx bx-wallet font-size-16 align-middle me-1"/>
-            {props.t("My Wallet")}
-          </DropdownItem>
-          <DropdownItem tag="a" href="#">
-            <span className="badge bg-success float-end">11</span>
-            <i className="bx bx-wrench font-size-16 align-middle me-1"/>
-            {props.t("Settings")}
-          </DropdownItem>
-          <DropdownItem tag="a" href="auth-lock-screen">
-            <i className="bx bx-lock-open font-size-16 align-middle me-1"/>
-            {props.t("Lock screen")}
           </DropdownItem>
           <div className="dropdown-divider"/>
           <Link to="/logout" className="dropdown-item">
@@ -93,8 +82,8 @@ ProfileMenu.propTypes = {
 }
 
 const mapStatetoProps = state => {
-  const { error, success } = state.Auth
-  return { error, success }
+  const { error, success, Profile } = state.Auth
+  return { error, success, Profile }
 }
 
 export default withRouter(

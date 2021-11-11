@@ -28,28 +28,28 @@ const ConfirmMail2 = props => {
               <div className="auth-full-page-content p-md-5 p-4">
                 <div className="w-100">
                   <div className="d-flex flex-column h-100">
-                    <div className="mb-4 mb-md-5">
-                      <a href="/" className="d-block auth-logo">
-                        <img
-                          src={logodark}
-                          alt=""
-                          className="auth-logo-dark img-fluid"
-                        />
-                        <img
-                          src={logolight}
-                          alt=""
-                          className="auth-logo-light img-fluid"
-                        />
-                      </a>
-                    </div>
                     <div className="my-auto">
+                      <div className="mb-4 mb-md-5">
+                        <a href="/" className="d-block auth-logo">
+                          <img
+                            src={logodark}
+                            alt=""
+                            className="auth-logo-dark img-fluid"
+                          />
+                          <img
+                            src={logolight}
+                            alt=""
+                            className="auth-logo-light img-fluid"
+                          />
+                        </a>
+                      </div>
                       <div className="text-center">
                         <Lottie
                           loop={false}
                           className="mx-auto"
                           animationData={lottieJson}
                           play
-                          style={{ width: 150, height: 150 }}
+                          style={{ width: 100, height: 100 }}
                         />
                         <div className="p-2 mt-4">
                           <h4>{props.t("Verify your email")}</h4>
@@ -62,7 +62,7 @@ const ConfirmMail2 = props => {
                             <p>
                               {props.t("Remember it ?")}{" "}
                               <Link
-                                to="login"
+                                to="/login"
                                 className="fw-medium text-primary"
                               >
                                 {" "}
