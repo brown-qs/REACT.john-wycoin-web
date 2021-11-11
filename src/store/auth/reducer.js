@@ -25,7 +25,7 @@ const initialState = {
   user: null,
   success: null,
   error: null,
-  Profile: null,
+  Profile: JSON.parse(localStorage.getItem('authUser')),
 }
 
 const auth = (state = initialState, action) => {
