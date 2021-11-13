@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 import { Dropdown, DropdownToggle, DropdownMenu, Row, Col } from "reactstrap"
 import SimpleBar from "simplebar-react"
@@ -47,8 +47,8 @@ const NotificationDropdown = props => {
             </Row>
           </div>
 
-          <SimpleBar style={{ height: "230px" }}>
-          {/* <Link to="" className="text-reset notification-item">
+          {/* <SimpleBar style={{ height: "230px" }}>
+          <Link to="" className="text-reset notification-item">
               <div className="media">
                 <div className="avatar-xs me-3">
                   <span className="avatar-title bg-primary rounded-circle font-size-16">
@@ -138,15 +138,14 @@ const NotificationDropdown = props => {
                   </div>
                 </div>
               </div>
-            </Link> */}
-          </SimpleBar>
+            </Link>
+          </SimpleBar> */}
           <div className="p-2 border-top d-grid">
             <Link
               className="btn btn-sm btn-link font-size-14 btn-block text-center"
               to="#"
             >
-              <i className="mdi mdi-arrow-right-circle me-1"></i>
-              {" "}
+              <i className="mdi mdi-arrow-right-circle me-1"></i>{" "}
               {props.t("View all")}{" "}
             </Link>
           </div>
@@ -159,5 +158,5 @@ const NotificationDropdown = props => {
 export default withTranslation()(NotificationDropdown)
 
 NotificationDropdown.propTypes = {
-  t: PropTypes.any
+  t: PropTypes.any,
 }

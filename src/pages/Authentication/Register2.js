@@ -18,6 +18,8 @@ import logolight from "../../assets/images/logo-light.png"
 
 import { useSelector, useDispatch } from "react-redux"
 import { registerUser } from "../../store/actions"
+import "./register.scss"
+
 const Register2 = props => {
   const dispatch = useDispatch()
 
@@ -94,10 +96,14 @@ const Register2 = props => {
                           </Row>
                           <Row className="mb-3">
                             <Col xl={12}>
-                              <label>Gender</label> <br />
-                              <AvRadioGroup inline name="gender" required>
-                                <AvRadio label="Male" value="0" />
-                                <AvRadio label="Female" value="1" />
+                              <label>{props.t("You are?")}</label> <br />
+                              <AvRadioGroup
+                                inline
+                                name="gender"
+                                required
+                              >
+                                <AvRadio label={props.t("A man")} value="0" />
+                                <AvRadio label={props.t("A woman")} value="1" />
                               </AvRadioGroup>
                             </Col>
                           </Row>

@@ -111,7 +111,7 @@ const Layout = props => {
   const Theme = lazy(() =>
     import(
       `../Theme/${
-        localStorage.getItem("theme") == "dark" ? "Dark" : "Light"
+        localStorage.getItem("APP_THEME") == "dark" ? "Dark" : "Light"
       }Theme`
     )
   )
@@ -143,7 +143,7 @@ const Layout = props => {
             isMobile={isMobile}
           />
           <div className="main-content">{props.children}</div>
-          <Footer />
+          {/* <Footer /> */}
         </div>
         {showRightSidebar ? <Rightbar /> : null}
       </Suspense>

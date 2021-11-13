@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import { connect } from "react-redux"
 import { Row, Col } from "reactstrap"
@@ -64,11 +64,11 @@ const Header = props => {
   }
 
   const toggleTheme = () => {
-    if (localStorage.getItem("theme") != "dark") {
-      localStorage.setItem("theme", "dark")
+    if (localStorage.getItem("APP_THEME") != "dark") {
+      localStorage.setItem("APP_THEME", "dark")
       location.reload()
     } else {
-      localStorage.setItem("theme", "light")
+      localStorage.setItem("APP_THEME", "light")
       location.reload()
     }
   }
@@ -108,6 +108,10 @@ const Header = props => {
       body.classList.toggle("vertical-collpsed")
       body.classList.toggle("sidebar-enable")
     }
+    localStorage.setItem(
+      "SIDEBAR_COLLAPSED",
+      body.classList.contains("vertical-collpsed")
+    )
   }
 
   return (
@@ -118,13 +122,13 @@ const Header = props => {
             <div className="navbar-brand-box d-lg-none d-md-block">
               <Link to="/" className="logo logo-dark">
                 <span className="logo-sm">
-                  <img src={favicon} alt="" width="70" />
+                  <img src={favicon} alt="" width="50" />
                 </span>
               </Link>
 
               <Link to="/" className="logo logo-light">
                 <span className="logo-sm">
-                  <img src={favicon} alt="" width="70" />
+                  <img src={favicon} alt="" width="50" />
                 </span>
               </Link>
             </div>
@@ -159,7 +163,13 @@ const Header = props => {
                 className="btn header-item noti-icon "
                 data-toggle="fullscreen"
               >
-                <i className={localStorage.getItem("theme") == "dark" ? "bx bx-moon" : "bx bxs-sun"} />
+                <i
+                  className={
+                    localStorage.getItem("APP_THEME") == "dark"
+                      ? "bx bx-moon"
+                      : "bx bxs-sun"
+                  }
+                />
               </button>
             </div>{" "}
           </div>
@@ -174,7 +184,7 @@ const Header = props => {
               {" "}
               {props.t("USD")} <i className="mdi mdi-chevron-down" />
             </DropdownToggle>
-            <DropdownMenu style={{minWidth: 'auto'}}>
+            <DropdownMenu style={{ minWidth: "auto" }}>
               <DropdownItem
                 onClick={() => settheme(0)}
                 className={`${theme === 0 ? "active" : "none"}`}

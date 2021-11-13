@@ -447,7 +447,7 @@ const Portofolio = props => {
               <Card>
                 <CardHeader>
                   <Button color="primary" className="w-100" size="sm">
-                    {props.t("Add a portfolio")}
+                    <i className="mdi mdi-wallet-plus-outline"> </i>  {props.t("Add a portfolio")}
                   </Button>
                 </CardHeader>
                 <CardBody>
@@ -481,7 +481,7 @@ const Portofolio = props => {
                         toggleVertical("2")
                       }}
                     >
-                      <img src="https://kraken.com/favicon.ico" />
+                      <img src="https://kraken.com/img/favicon.ico" />
                       Kraken
                     </NavLink>
                   </NavItem>

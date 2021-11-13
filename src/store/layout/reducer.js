@@ -20,14 +20,20 @@ import {
   leftBarThemeImageTypes,
   leftSidebarTypes,
   leftSideBarThemeTypes,
-} from "../../constants/layout";
+} from "../../constants/layout"
 
 const INIT_STATE = {
   layoutType: layoutTypes.VERTICAL,
   layoutWidth: layoutWidthTypes.FLUID,
-  leftSideBarTheme: localStorage.getItem('theme') == 'dark' ? leftSideBarThemeTypes.DARK : leftSideBarThemeTypes.LIGHT,
+  leftSideBarTheme:
+    localStorage.getItem("APP_THEME") == "dark"
+      ? leftSideBarThemeTypes.DARK
+      : leftSideBarThemeTypes.LIGHT,
   leftSideBarThemeImage: leftBarThemeImageTypes.NONE,
-  leftSideBarType: leftSidebarTypes.DEFAULT,
+  leftSideBarType:
+    localStorage.getItem("SIDEBAR_COLLAPSED") == "true"
+      ? leftSidebarTypes.ICON
+      : leftSidebarTypes.DEFAULT,
   topbarTheme: topBarThemeTypes.LIGHT,
   isPreloader: false,
   showRightSidebar: false,

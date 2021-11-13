@@ -6,7 +6,7 @@ const NonAuthLayout = props => {
   const Theme = lazy(() =>
     import(
       `./Theme/${
-        localStorage.getItem("theme") == "dark" ? "Dark" : "Light"
+        localStorage.getItem("APP_THEME") == "dark" ? "Dark" : "Light"
       }Theme`
     )
   )

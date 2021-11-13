@@ -18,7 +18,7 @@
   .auth-logo-light {
     display: $display-none;
   }
-  width: 165px;
+  width: 195px;
   margin-right: auto !important;
   margin-left: auto !important;
 }
@@ -67,9 +67,9 @@
 .auth-full-page-content {
   display: flex;
 
-  @media (min-width: 1200px) {
+  // @media (min-width: 1200px) {
     min-height: 100vh;
-  }
+  // }
 }
 
 .auth-review-carousel {

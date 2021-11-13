@@ -47,7 +47,7 @@ const InboxDropdown = props => {
             </Row>
           </div>
 
-          <SimpleBar style={{ height: "230px" }}>
+          {/* <SimpleBar style={{ height: "230px" }}>
             <Link to="" className="text-reset notification-item">
               <div className="media">
                 <div className="avatar-xs me-3">
@@ -139,7 +139,7 @@ const InboxDropdown = props => {
                 </div>
               </div>
             </Link>
-          </SimpleBar>
+          </SimpleBar> */}
           <div className="p-2 border-top d-grid">
             <Link
               className="btn btn-sm btn-link font-size-14 btn-block text-center"
