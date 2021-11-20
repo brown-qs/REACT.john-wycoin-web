@@ -4,13 +4,9 @@ import { Container } from "reactstrap"
 
 //Import Breadcrumb
 import Breadcrumbs from "../../components/Common/Breadcrumb"
-import { useDispatch } from "react-redux"
-import { getChartsData } from "../../store/actions"
 
 const Dashboard = () => {
-  const dispatch = useDispatch()
   useEffect(() => {
-    dispatch(getChartsData())
   }, [])
   return (
     <React.Fragment>

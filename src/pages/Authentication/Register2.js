@@ -25,7 +25,6 @@ const Register2 = props => {
 
   // handleValidSubmit
   const handleValidSubmit = (event, values) => {
-    console.log(values)
     dispatch(registerUser(values, props.history))
   }
   return (

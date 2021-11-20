@@ -100,7 +100,7 @@ const SidebarContent = props => {
             </li>
 
             <li>
-              <Link to="/portofolio" className=" ">
+              <Link to="/portfolio" className=" ">
                 <i className="bx bxs-bar-chart-alt-2"></i>
                 <span>{props.t("Wallet")}</span>
               </Link>

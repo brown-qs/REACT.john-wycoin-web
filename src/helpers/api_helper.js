@@ -15,8 +15,9 @@ const axiosApi = axios.create({
     return status >= 200 && status < 500 // default
   },
 })
-
-// axiosApi.defaults.headers.common["Authorization"] = token
+if (localStorage.getItem('authUser')) {
+  axiosApi.defaults.headers.common["Authorization"] = JSON.parse(localStorage.getItem('authUser')).token
+}
 
 axiosApi.interceptors.response.use(
   response => response,
@@ -28,13 +29,37 @@ export function setAuthorizationToken(token) {
 }
 
 export async function get(url, config = {}) {
-  return await axiosApi.get(url, { ...config }).then(response => response.data)
+  return await axiosApi.get(url, { ...config }).then(response => {
+    if (response.status === 401) {
+      localStorage.removeItem("authUser")
+      location.href = "/login"
+      throw "Unauthorized"
+    }
+    if (!response.data.success) {
+      for (const group in response.data.errors) {
+        response.data.errors[group].map(msg => toastr.warning(msg))
+      }
+      throw response.data
+    }
+    return response.data
+  })
 }
 
 export async function post(url, data, config = {}) {
-  return axiosApi
-    .post(url, { ...data }, { ...config })
-    .then(response => response.data)
+  return axiosApi.post(url, { ...data }, { ...config }).then(response => {
+    if (response.status === 401) {
+      localStorage.removeItem("authUser")
+      location.href = "/login"
+      throw "Unauthorized"
+    }
+    if (!response.data.success) {
+      for (const group in response.data.errors) {
+        response.data.errors[group].map(msg => toastr.warning(msg))
+      }
+      throw response.data
+    }
+    return response.data
+  })
 }
 
 export async function put(url, data, config = {}) {

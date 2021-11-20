@@ -2,6 +2,7 @@ export * from "./layout/actions"
 
 // Authentication module
 export * from "./auth/actions"
+export * from "./portfolio/actions"
 
 //Ecommerce
 export * from "./e-commerce/actions"

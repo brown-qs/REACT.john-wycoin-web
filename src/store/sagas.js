@@ -3,6 +3,8 @@ import { all, fork } from "redux-saga/effects"
 //public
 import AuthSaga from "./auth/saga"
 import LayoutSaga from "./layout/saga"
+import PortfolioSaga from "./portfolio/saga"
+
 import ecommerceSaga from "./e-commerce/saga"
 import calendarSaga from "./calendar/saga"
 import chatSaga from "./chat/saga"
@@ -20,6 +22,8 @@ export default function* rootSaga() {
     //public
     fork(AuthSaga),
     fork(LayoutSaga),
+    fork(PortfolioSaga),
+
     fork(ecommerceSaga),
     fork(calendarSaga),
     fork(chatSaga),

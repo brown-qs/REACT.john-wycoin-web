@@ -18,7 +18,6 @@ function* getChartsData({ payload: periodType }) {
     // if (response.success) {
     //   history.push("/confirm-mail")
     // }
-    console.log(response)
 
     yield put(apiSuccess(GET_CHARTS_DATA, response))
   } catch (error) {

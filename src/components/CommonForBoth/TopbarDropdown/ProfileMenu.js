@@ -22,7 +22,6 @@ const ProfileMenu = props => {
   const [menu, setMenu] = useState(false)
 
   const [username, setusername] = useState("Admin")
-  console.log(props.Profile)
 
   useEffect(() => {
     if (localStorage.getItem("authUser")) {

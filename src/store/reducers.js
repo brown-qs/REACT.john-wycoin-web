@@ -6,6 +6,9 @@ import Layout from "./layout/reducer"
 // Authentication
 import Auth from "./auth/reducer"
 
+// Portfolio
+import Portfolio from "./portfolio/reducer"
+
 //E-commerce
 import ecommerce from "./e-commerce/reducer"
 
@@ -43,6 +46,8 @@ const rootReducer = combineReducers({
   // public
   Layout,
   Auth,
+  Portfolio,
+  
   ecommerce,
   calendar,
   chat,

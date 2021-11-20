@@ -10,11 +10,7 @@ import {
   LOGOUT_USER,
   SOCIAL_LOGIN,
 } from "./actionTypes"
-import {
-  userForgetPasswordError,
-  loginSuccess,
-  apiError,
-} from "./actions"
+import { userForgetPasswordError, loginSuccess, apiError } from "./actions"
 import { del, get, post } from "../../helpers/api_helper"
 import toastr from "toastr"
 import "toastr/build/toastr.min.css"
@@ -24,6 +20,7 @@ function* forgetUser({ payload: { user, history } }) {
   try {
     const response = yield post("forgot-password", user)
     if (response.success) {
+      toastr.success(response.message)
       history.push("/confirm-mail")
     }
   } catch (error) {
@@ -34,9 +31,8 @@ function* forgetUser({ payload: { user, history } }) {
 function* resetPassword({ payload: { user, history } }) {
   try {
     const response = yield post("reset-password", user)
-    console.log(response)
     if (response.success) {
-      toastr.success("Your password is successfully reset!")
+      toastr.success(response.message)
       history.push("/login")
     } else {
       for (const group in response.errors) {
@@ -55,15 +51,11 @@ function* loginUser({ payload: { user, history } }) {
       yield put(loginSuccess(response.data))
       history.push("/dashboard")
     } else {
-      for (const group in response.errors) {
-        response.errors[group].map(msg => toastr.warning(msg))
-      }
-      if (response.type == "unverified-email") {
-        history.push("/two-step-verification/" + response.data.email)
-      }
     }
   } catch (error) {
-    yield put(apiError(error))
+    if (error.type == "unverified-email") {
+      history.push("/two-step-verification/" + error.data.email)
+    }
   }
 }
 
@@ -110,8 +102,7 @@ function* registerUser({ payload: { user, history } }) {
       }
     }
   } catch (error) {
-    console.log(error)
-    toastr.warning("Duplicate Username or Email")
+    toastr.warning("Username or Email already exists.")
   }
 }
 function* verifyEmail({ payload: { user, history } }) {

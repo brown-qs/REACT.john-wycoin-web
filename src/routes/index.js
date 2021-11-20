@@ -15,11 +15,11 @@ import ResetPassword from '../pages/Authentication/ResetPassword'
 
 // Pages
 import Dashboard from "../pages/Dashboard/index"
-import Portofolio from "../pages/Portofolio"
+import Portfolio from "../pages/Portfolio"
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: Dashboard },
-  { path: "/portofolio", component: Portofolio },
+  { path: "/portfolio", component: Portfolio },
 
   // //profile
   { path: "/profile", component: UserProfile },
