@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Redirect } from "react-router-dom"
 
 // Profile
@@ -11,7 +11,7 @@ import Register2 from "../pages/Authentication/Register2"
 import TwostepVerification2 from "../pages/Authentication/auth-two-step-verification-2"
 import ForgetPassword2 from "../pages/Authentication/ForgetPassword2"
 import ConfirmMail2 from "../pages/Authentication/page-confirm-mail-2"
-import ResetPassword from '../pages/Authentication/ResetPassword'
+import ResetPassword from "../pages/Authentication/ResetPassword"
 
 // Pages
 import Dashboard from "../pages/Dashboard/index"
@@ -37,6 +37,45 @@ const publicRoutes = [
   { path: "/forgot-password", component: ForgetPassword2 },
   { path: "/confirm-mail", component: ConfirmMail2 },
   { path: "/reset-password/:email/:token", component: ResetPassword },
+
+  {
+    path: "/coinbase-oauth-redirect",
+    component: () => {
+      useEffect(() => {
+        const params = window.location.search
+        if (window.opener) {
+          // send them to the opening window
+          var queryDict = {}
+          location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+              queryDict[item.split("=")[0]] = item.split("=")[1]
+            })
+          window.opener.postMessage({
+            source: "coinbase-oauth-redirect",
+            code: queryDict.code,
+          })
+          // close the popup
+          window.close()
+        }
+      })
+      return (
+        <div id="preloader">
+          <div id="status">
+            <div className="spinner-chase">
+              <div className="chase-dot" />
+              <div className="chase-dot" />
+              <div className="chase-dot" />
+              <div className="chase-dot" />
+              <div className="chase-dot" />
+              <div className="chase-dot" />
+            </div>
+          </div>
+        </div>
+      )
+    },
+  },
 ]
 
 export { publicRoutes, authProtectedRoutes }

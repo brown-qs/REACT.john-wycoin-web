@@ -1,8 +1,8 @@
 import axios from "axios"
-import accessToken from "./jwt-token-access/accessToken"
+import toastr from "toastr"
+import "toastr/build/toastr.min.css"
 
 //pass new generated access token here
-const token = accessToken
 
 //apply base url for axios
 // const API_URL = 'https://api.wycoin.fr/api';
@@ -15,14 +15,27 @@ const axiosApi = axios.create({
     return status >= 200 && status < 500 // default
   },
 })
-if (localStorage.getItem('authUser')) {
-  axiosApi.defaults.headers.common["Authorization"] = JSON.parse(localStorage.getItem('authUser')).token
-}
-
 axiosApi.interceptors.response.use(
   response => response,
   error => Promise.reject(error)
 )
+
+axiosApi
+  .get(
+    "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/usd.json",
+    {
+      withCredentials: false,
+    }
+  )
+  .then(({ data }) => {
+    localStorage.setItem("eur_rate", data.usd)
+  })
+
+if (localStorage.getItem("authUser")) {
+  setAuthorizationToken(JSON.parse(localStorage.getItem("authUser")).token)
+}
+
+export { axiosApi }
 
 export function setAuthorizationToken(token) {
   axiosApi.defaults.headers.common["Authorization"] = "Bearer " + token

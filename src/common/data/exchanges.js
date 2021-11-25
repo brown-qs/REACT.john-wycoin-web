@@ -100,10 +100,22 @@ const howToAddData = {
       "Copy/paste your API Key and API Secret",
     ],
   },
-  ledger: {
-    heading: "How to add Ledger account",
-    steps: ["", "", "", "", ""],
-  },
+  // ledger: {
+  //   heading: "How to add Ledger account",
+  //   steps: [
+  //     "Connect your Ledger device",
+  //     "Login to Ledger Live desktop app",
+  //     "Open the Ledger wallet for the coin of your choice",
+  //     "Select the relevant account (left-hand side)",
+  //     "For Bitcoin, Bitcoin Cash, Dash, Dogecoin, Litecoin, and Zcash wallets",
+  //     "Click the wrench icon (top right side)",
+  //     "Click Advanced Logs",
+  //     "Copy the xPub key prefixed with 'xpub' between the quotes and paste it",
+  //     "For all other coins",
+  //     "View the list of transactions and addresses in the wallet",
+  //     "Copy each address",
+  //   ],
+  // },
 }
 
 export { exchangeData, howToAddData }

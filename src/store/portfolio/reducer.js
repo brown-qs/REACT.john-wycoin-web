@@ -10,7 +10,7 @@ import "toastr/build/toastr.min.css"
 const initialState = {
   userExchanges: [],
   userExchangesLoaded: false,
-  exchangeTransactions: [],
+  exchangeTransactions: {},
 }
 
 const portfolio = (state = initialState, action) => {
@@ -28,9 +28,11 @@ const portfolio = (state = initialState, action) => {
         userExchangesLoaded: true,
       }
     case LOAD_EXCHANGE_TRANSACTIONS:
+      let newState = { ...state.exchangeTransactions }
+      newState[action.payload.id] = action.payload.transactions
       state = {
         ...state,
-        exchangeTransactions: [...action.payload],
+        exchangeTransactions: newState,
       }
     default:
       state = { ...state }

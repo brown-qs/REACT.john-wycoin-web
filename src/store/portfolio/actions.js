@@ -14,9 +14,9 @@ export const loadUserExchanges = exchanges => {
   }
 }
 
-export const loadExchangeTransactions = trans => {
+export const loadExchangeTransactions = data => {
   return {
     type: LOAD_EXCHANGE_TRANSACTIONS,
-    payload: trans,
+    payload: data,
   }
 }

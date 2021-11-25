@@ -182,18 +182,24 @@ const Header = props => {
           >
             <DropdownToggle className="btn header-item " caret tag="button">
               {" "}
-              {props.t("USD")} <i className="mdi mdi-chevron-down" />
+              {localStorage.getItem('app_currency') == 'eur' ? props.t("EUR") : props.t("USD")} <i className="mdi mdi-chevron-down" />
             </DropdownToggle>
             <DropdownMenu style={{ minWidth: "auto" }}>
               <DropdownItem
-                onClick={() => settheme(0)}
-                className={`${theme === 0 ? "active" : "none"}`}
+                onClick={() => {
+                  localStorage.setItem("app_currency", "usd")
+                  location.reload()
+                }}
+                className={`${megaMenu === 0 ? "active" : "none"}`}
               >
                 {props.t("USD")}
               </DropdownItem>
               <DropdownItem
-                onClick={() => settheme(1)}
-                className={`${theme === 1 ? "active" : "none"}`}
+                onClick={() => {
+                  localStorage.setItem("app_currency", "eur")
+                  location.reload()
+                }}
+                className={`${megaMenu === 1 ? "active" : "none"}`}
               >
                 {props.t("EUR")}
               </DropdownItem>
