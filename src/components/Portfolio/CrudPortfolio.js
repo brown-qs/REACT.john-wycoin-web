@@ -119,25 +119,10 @@ const CrudPortfolio = props => {
     if (data.source === "coinbase-oauth-redirect") {
       // get the URL params and redirect to our server to use Passport to auth/login
       const { code } = data
-      console.log("axios", axiosApi)
-      axiosApi
-        .post(
-          "https://api.coinbase.com/oauth/token",
-          {
-            grant_type: "authorization_code",
-            code,
-            client_id,
-            client_secret,
-            redirect_uri,
-          },
-          {
-            withCredentials: false,
-          }
-        )
-        .then(({ data }) => {
-          if (coinbaseAutoTitle.length) console.log(data)
-          handleAddExchange(null, { ...data, title: coinbaseAutoTitle })
-        })
+      post(`coinbase-auth-token`, { code }).then(({ data }) => {
+        if (coinbaseAutoTitle.length) console.log(data)
+        handleAddExchange(null, { ...data, title: coinbaseAutoTitle })
+      })
     }
   }
 
