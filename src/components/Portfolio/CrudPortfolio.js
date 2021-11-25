@@ -105,13 +105,11 @@ const CrudPortfolio = props => {
   let previousUrl = null
   const client_id =
     "cbe15651c9f49ef21ad8d08d8343764a7b772e3859cf309a015e8c4bd428e770"
-  const client_secret =
-    "f61c22fd167213f43fd1d5cccaa3b7a29247c7622f607920a20450e90165b5ad"
-  const redirect_uri = "http://localhost:3000/coinbase-oauth-redirect"
+  const redirect_uri = location.origin + "/coinbase-oauth-redirect"
 
   const receiveMessage = event => {
     console.log(event)
-    if (event.origin !== "http://localhost:3000") {
+    if (event.origin !== location.origin) {
       return
     }
     const { data } = event
@@ -315,7 +313,7 @@ const CrudPortfolio = props => {
             onClick={e => {
               e.preventDefault()
               openSignInWindow(
-                `https://www.coinbase.com/oauth/authorize?account=all&client_id=${client_id}&redirect_uri=http://localhost:3000/coinbase-oauth-redirect&response_type=code&scope=wallet%3Aaccounts%3Aread%2Cwallet%3Atransactions%3Aread%2Cwallet%3Adeposits%3Aread%2Cwallet%3Awithdrawals%3Aread%2Cwallet%3Aaddresses%3Aread%2Cwallet%3Aaddresses%3Acreate%2Cwallet%3Auser%3Aread%2Cwallet%3Auser%3Aemail`,
+                `https://www.coinbase.com/oauth/authorize?account=all&client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code&scope=wallet%3Aaccounts%3Aread%2Cwallet%3Atransactions%3Aread%2Cwallet%3Adeposits%3Aread%2Cwallet%3Awithdrawals%3Aread%2Cwallet%3Aaddresses%3Aread%2Cwallet%3Aaddresses%3Acreate%2Cwallet%3Auser%3Aread%2Cwallet%3Auser%3Aemail`,
                 "Wycoin - Coinbase"
               )
             }}
