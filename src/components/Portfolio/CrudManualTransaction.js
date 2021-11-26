@@ -7,6 +7,7 @@ import {
   DropdownItem,
   DropdownMenu,
   InputGroup,
+  InputGroupAddon,
   Nav,
   NavItem,
   NavLink,
@@ -40,8 +41,23 @@ const CrudManualTransaction = props => {
     useState(0)
 
   const [dropdown_open1, setdropdown_open1] = useState(false)
+  const [dropdown_open2, setdropdown_open2] = useState(false)
+  const [dropdown_open3, setdropdown_open3] = useState(false)
   const [switch_save_ico, setswitch_save_ico] = useState(false)
+  const [coins_list1, setcoins_list1] = useState([])
+  const [coins_list2, setcoins_list2] = useState([])
 
+  const [coin_loading1, setcoin_loading1] = useState(false)
+  const [coin_loading2, setcoin_loading2] = useState(false)
+
+  const [coin, setcoin] = useState("")
+  const [pair_coin, setpair_coin] = useState("")
+  const [coin_label, setcoin_label] = useState("")
+  const [coin_img, setcoin_img] = useState("")
+
+  let coinSearchTimer1 = false
+  let coinSearchTimer2 = false
+  let addMore = false
   return (
     <React.Fragment>
       <Modal
@@ -81,17 +97,6 @@ const CrudManualTransaction = props => {
                 {props.t("ICO")}
               </NavLink>
             </NavItem>
-            <NavItem>
-              <NavLink
-                style={{ cursor: "pointer" }}
-                className={manual_add_transaction_mode == 2 ? "active" : ""}
-                onClick={() => {
-                  setmanual_add_transaction_mode(2)
-                }}
-              >
-                {props.t("Swap")}
-              </NavLink>
-            </NavItem>
           </Nav>
 
           <TabContent
@@ -99,150 +104,183 @@ const CrudManualTransaction = props => {
             className="p-3 text-muted"
           >
             <TabPane tabId={0}>
-              <AvForm className="form-horizontal" onValidSubmit={(e, v) => {}}>
+              <AvForm
+                className="form-horizontal"
+                onValidSubmit={(e, v) => {
+                  setmodal_manual_add_transaction(false)
+                  post("create-custom-transaction", {
+                    ...v,
+                    portfolio_id: props.portfolioId,
+                  }).then(({ data }) => {
+                    console.log(data)
+                    if (addMore) {
+                      setmodal_manual_add_transaction(true)
+                    }
+                  })
+                }}
+              >
+                <AvInput type="hidden" name="type" value="buy" />
                 <div className="row">
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("What do you buy?")}</label>
                     <Select
-                      name="coin"
-                      options={[
-                        {
-                          value: "bitcoin",
-                          label: (
-                            <div>
-                              <img
-                                src="https://static.coinstats.app/coins/Bitcoin6l39t.png"
-                                height="30px"
-                                width="30px"
-                              />
-                              Bitcoin <span className="text-muted">BTC</span>
-                            </div>
-                          ),
+                      isLoading={coin_loading1}
+                      theme={theme => ({
+                        ...theme,
+                        borderRadius: 0,
+                        colors: {
+                          ...theme.colors,
+                          text: "orangered",
+                          neutral0: "#32394e",
+                          neutral20: "#32394e",
+                          neutral30: "var(--input-color)",
+                          neutral80: "var(--input-color)",
                         },
-                        {
-                          value: "tether",
-                          label: (
-                            <div>
-                              <img
-                                src="https://static.coinstats.app/coins/TetherfopnG.png"
-                                width="30"
-                              />{" "}
-                              Tether
-                            </div>
-                          ),
-                        },
-                      ]}
-                      onChange={({ value }) => {}}
+                      })}
+                      filterOption={() => true}
+                      options={coins_list1}
+                      onInputChange={e => {
+                        if (e == "") return
+                        setcoin_loading1(true)
+                        if (coinSearchTimer1) clearTimeout(coinSearchTimer1)
+                        coinSearchTimer1 = setTimeout(() => {
+                          get("/search/coins?search=" + e).then(({ data }) => {
+                            setcoin_loading1(false)
+                            setcoins_list1(
+                              data.map(dat => {
+                                return {
+                                  value: dat,
+                                  label: (
+                                    <div>
+                                      <img
+                                        src={dat.ic}
+                                        height="30px"
+                                        width="30px"
+                                      />{" "}
+                                      {dat.n}{" "}
+                                      <span className="text-muted">
+                                        {dat.s}
+                                      </span>
+                                    </div>
+                                  ),
+                                }
+                              })
+                            )
+                          })
+                          coinSearchTimer1 = false
+                        }, 1000)
+                      }}
+                      onChange={({ value }) => {
+                        setcoin(value.s)
+                        setcoin_label(value.n)
+                        setcoin_img(value.ic)
+                      }}
                     />
-                    <AvField type="hidden" name="coin" />
+                    <AvField type="hidden" name="coin" value={coin} required />
+                    <AvInput
+                      type="hidden"
+                      name="coin_label"
+                      value={coin_label}
+                    />
+                    <AvInput
+                      type="hidden"
+                      name="coin_img"
+                      value={coin_img}
+                      required
+                    />
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("With what (pair)?")}</label>
                     <Select
-                      name="coin"
-                      value="bitcoin"
-                      options={[
-                        {
-                          value: "bitcoin",
-                          label: (
-                            <div>
-                              <img
-                                src="https://static.coinstats.app/coins/Bitcoin6l39t.png"
-                                height="30px"
-                                width="30px"
-                              />
-                              Bitcoin <span className="text-muted">BTC</span>
-                            </div>
-                          ),
+                      isLoading={coin_loading2}
+                      theme={theme => ({
+                        ...theme,
+                        borderRadius: 0,
+                        colors: {
+                          ...theme.colors,
+                          text: "orangered",
+                          neutral0: "#32394e",
+                          neutral20: "#32394e",
+                          neutral30: "var(--input-color)",
+                          neutral80: "var(--input-color)",
                         },
-                        {
-                          value: "strawberry",
-                          label: (
-                            <div>
-                              <img
-                                src="https://static.coinstats.app/coins/TetherfopnG.png"
-                                width="30"
-                              />{" "}
-                              Tether
-                            </div>
-                          ),
-                        },
-                      ]}
+                      })}
+                      filterOption={() => true}
+                      options={coins_list2}
+                      onInputChange={e => {
+                        if (e == "") return
+                        setcoin_loading2(true)
+                        if (coinSearchTimer2) clearTimeout(coinSearchTimer2)
+                        coinSearchTimer2 = setTimeout(() => {
+                          get("/search/coins?search=" + e).then(({ data }) => {
+                            setcoin_loading1(false)
+                            setcoins_list2(
+                              data.map(dat => {
+                                return {
+                                  value: dat,
+                                  label: (
+                                    <div>
+                                      <img
+                                        src={dat.ic}
+                                        height="30px"
+                                        width="30px"
+                                      />{" "}
+                                      {dat.n}{" "}
+                                      <span className="text-muted">
+                                        {dat.s}
+                                      </span>
+                                    </div>
+                                  ),
+                                }
+                              })
+                            )
+                          })
+                          coinSearchTimer2 = false
+                        }, 1000)
+                      }}
+                      onChange={({ value }) => {
+                        setpair_coin(value.s)
+                        console.log(value)
+                      }}
+                    />
+                    <AvField
+                      type="hidden"
+                      name="pair_coin"
+                      value={pair_coin}
+                      required
                     />
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("On which market?")}</label>
-                    <Select
-                      name="coin"
-                      value="bitcoin"
-                      options={[
-                        {
-                          value: "bitcoin",
-                          label: "Binance",
-                        },
-                      ]}
-                    />
+                    <AvField type="select" name="exchange_platform" required>
+                      <option value="bitcoin">Binance</option>
+                      <option value="coinbase">Coinbase</option>
+                      <option value="Coinbase">Binance</option>
+                      <option value="gate_io">Gate.io</option>
+                      <option value="ftx">FTX</option>
+                      <option value="kraken">Kraken</option>
+                    </AvField>
                   </div>
                   <div className="col-sm-6 mt-3">
                     <AvField
-                      type="number"
+                      type="text"
                       label={props.t("Amount ?")}
-                      name="sdf"
+                      name="quantity"
+                      required
                     />
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("At what cost?")}</label>
                     <InputGroup>
-                      <AvInput name="sdf" />
-                      <Dropdown
-                        isOpen={dropdown_open1}
-                        toggle={() => {
-                          setdropdown_open1(!dropdown_open1)
-                        }}
-                      >
-                        <DropdownToggle
-                          className="input-group-text"
-                          tag="button"
-                        >
-                          USDT <i className="bx bx-chevron-down"></i>{" "}
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                          <DropdownItem header>Header</DropdownItem>
-                          <DropdownItem disabled>Action</DropdownItem>
-                          <DropdownItem>Another Action</DropdownItem>
-                          <DropdownItem divider />
-                          <DropdownItem>Another Action</DropdownItem>
-                        </DropdownMenu>{" "}
-                      </Dropdown>
+                      <AvInput name="purchase_price" required />
+                      <InputGroupAddon addonType="append">USD</InputGroupAddon>
                     </InputGroup>
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("Amount invested?")}</label>
                     <InputGroup>
-                      <AvInput name="sdf" />
-                      <button
-                        className="input-group-text"
-                        onClick={() => {
-                          setdropdown_open1(!dropdown_open1)
-                        }}
-                      >
-                        USDT <i className="bx bx-chevron-down"></i>
-                      </button>
-                      <Dropdown
-                        isOpen={dropdown_open1}
-                        toggle={() => {
-                          setdropdown_open1(!dropdown_open1)
-                        }}
-                      >
-                        <DropdownToggle className="d-none" />
-                        <DropdownMenu end>
-                          <DropdownItem header>Header</DropdownItem>
-                          <DropdownItem disabled>Action</DropdownItem>
-                          <DropdownItem>Another Action</DropdownItem>
-                          <DropdownItem divider />
-                          <DropdownItem>Another Action</DropdownItem>
-                        </DropdownMenu>{" "}
-                      </Dropdown>
+                      <AvInput name="amount" required />
+                      <InputGroupAddon addonType="append">USD</InputGroupAddon>
                     </InputGroup>
                   </div>
                   <div className="col-sm-6 mt-3">
@@ -251,54 +289,43 @@ const CrudManualTransaction = props => {
                       className="form-control"
                       type="date"
                       label={props.t("On what date?")}
+                      required
                     />
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("Any fees ?")}</label>
                     <InputGroup>
-                      <AvInput name="sdf" />
-                      <button
-                        className="input-group-text"
-                        onClick={() => {
-                          setdropdown_open1(!dropdown_open1)
-                        }}
-                      >
-                        USDT <i className="bx bx-chevron-down"></i>
-                      </button>
-                      <Dropdown
-                        isOpen={dropdown_open1}
-                        toggle={() => {
-                          setdropdown_open1(!dropdown_open1)
-                        }}
-                      >
-                        <DropdownToggle className="d-none" />
-                        <DropdownMenu end>
-                          <DropdownItem header>Header</DropdownItem>
-                          <DropdownItem disabled>Action</DropdownItem>
-                          <DropdownItem>Another Action</DropdownItem>
-                          <DropdownItem divider />
-                          <DropdownItem>Another Action</DropdownItem>
-                        </DropdownMenu>{" "}
-                      </Dropdown>
+                      <AvInput name="fees" type="text" required />
+                      <InputGroupAddon addonType="append">USD</InputGroupAddon>
                     </InputGroup>
                   </div>
                   <div className="col-sm-12 mt-3">
                     <AvField
                       rows={5}
                       type="textarea"
-                      name="text"
+                      name="note"
                       label={props.t("A note?")}
                     />
                   </div>
                 </div>
                 <div className="row mt-3">
                   <div className="col-sm-6 mt-3">
-                    <button className="btn btn-success w-100">
+                    <button
+                      className="btn btn-success w-100"
+                      onClick={() => {
+                        addMore = false
+                      }}
+                    >
                       {props.t("Save")}
                     </button>
                   </div>{" "}
                   <div className="col-sm-6 mt-3">
-                    <button className="btn btn-primary w-100">
+                    <button
+                      className="btn btn-primary w-100"
+                      onClick={() => {
+                        addMore = true
+                      }}
+                    >
                       {props.t("Save")} +
                     </button>
                   </div>
@@ -476,25 +503,6 @@ const CrudManualTransaction = props => {
                   </div>
                 </div>
               </AvForm>
-            </TabPane>
-            <TabPane tabId={2}>
-              <Row>
-                <Col sm="12">
-                  <CardText className="mb-0">
-                    Etsy mixtape wayfarers, ethical wes anderson tofu before
-                    they sold out mcsweeney&apos;s organic lomo retro fanny pack
-                    lo-fi farm-to-table readymade. Messenger bag gentrify
-                    pitchfork tattooed craft beer, iphone skateboard locavore
-                    carles etsy salvia banksy hoodie helvetica. DIY synth PBR
-                    banksy irony. Leggings gentrify squid 8-bit cred pitchfork.
-                    Williamsburg banh mi whatever gluten-free, carles pitchfork
-                    biodiesel fixie etsy retro mlkshk vice blog. Scenester cred
-                    you probably haven&apos;t heard of them, vinyl craft beer
-                    blog stumptown. Pitchfork sustainable tofu synth chambray
-                    yr.
-                  </CardText>
-                </Col>
-              </Row>
             </TabPane>
           </TabContent>
         </div>

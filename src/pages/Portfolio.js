@@ -77,7 +77,7 @@ const Portfolio = props => {
       isDummyField: true,
       formatter: (cell, row) => (
         <div>
-          <img src={row.coin_img} width="30" />
+          <img src={row.coin_img} width="30" />{" "}
           <span>{row.coin_label}</span>{" "}
           <span className="text-secondary">{row.coin}</span>
         </div>
@@ -246,13 +246,13 @@ const Portfolio = props => {
                 <CardBody>
                   <PaginationProvider
                     pagination={paginationFactory(pageOptions)}
-                    keyField="index"
+                    keyField="id"
                     columns={columns}
                     data={props.transactions[selectedExchangeId] ?? []}
                   >
                     {({ paginationProps, paginationTableProps }) => (
                       <ToolkitProvider
-                        keyField="index"
+                        keyField="id"
                         columns={columns}
                         data={props.transactions[selectedExchangeId] ?? []}
                         search
@@ -277,7 +277,7 @@ const Portfolio = props => {
                               <Col xl="12">
                                 <div className="table-responsive">
                                   <BootstrapTable
-                                    keyField={"index"}
+                                    keyField={"id"}
                                     responsive
                                     bordered={false}
                                     striped={false}

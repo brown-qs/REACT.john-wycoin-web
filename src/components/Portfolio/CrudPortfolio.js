@@ -51,6 +51,7 @@ const CrudPortfolio = props => {
     "briefcase-variant-outline"
   )
   const [metamask_mode, setmetamask_mode] = useState(0)
+  const [coins_list, setcoins_list] = useState([])
   const [walletConnected, setwalletConnected] = useState(false)
   const [colorRgb, setcolorRgb] = useState("")
   const metamaskConnector = new InjectedConnector({
@@ -201,6 +202,9 @@ const CrudPortfolio = props => {
       </div>
     </AvForm>
   )
+
+  let metamask_crypto_input = ""
+
   const apiAddForms = {
     binance: defaultAddForm,
     gate_io: defaultAddForm,
@@ -385,33 +389,36 @@ const CrudPortfolio = props => {
                 neutral80: "var(--input-color)",
               },
             })}
-            options={[
-              {
-                value: "1",
-                label: (
-                  <div>
-                    <img
-                      src="https://static.coinstats.app/coins/EthereumOCjgD.png"
-                      height="30px"
-                      width="30px"
-                    />
-                    Ethereum
-                  </div>
-                ),
-              },
-              {
-                value: "56",
-                label: (
-                  <div>
-                    <img
-                      src="https://static.coinstats.app/coins/binancecoinOxw.png"
-                      width="30"
-                    />{" "}
-                    Binance
-                  </div>
-                ),
-              },
-            ]}
+            options={coins_list}
+            filterOption={() => true}
+            onInputChange={e => {
+              if (e == "") return
+              if (metamask_crypto_input) clearTimeout(metamask_crypto_input)
+              metamask_crypto_input = setTimeout(() => {
+                get("/search/networks?search=" + e).then(({ data }) => {
+                  setcoins_list(
+                    data.map(dat => {
+                      return {
+                        value: dat.connectionId,
+                        label: (
+                          <div>
+                            <img
+                              src={
+                                "data:image/png;base64, " + dat.blockchain.icon
+                              }
+                              height="30px"
+                              width="30px"
+                            />{" "}
+                            {dat.blockchain.name}
+                          </div>
+                        ),
+                      }
+                    })
+                  )
+                })
+                metamask_crypto_input = false
+              }, 1000)
+            }}
             onChange={({ value }) => {
               setselected_metamask_chainId(value)
             }}
@@ -452,7 +459,11 @@ const CrudPortfolio = props => {
                     setselected_metamask_wallet_address(account)
                     setwalletConnected(true)
                     metamaskConnector.getChainId().then(res => {
-                      setselected_metamask_chainId(Number(res)) // res is 0x1
+                      let walletChainIds = {
+                        1: "rxxoewu0X8",
+                        56: "binacesmartchain",
+                      }
+                      setselected_metamask_chainId(walletChainIds[res]) // res is 0x1
                     })
                   })
                   .catch(error => {
