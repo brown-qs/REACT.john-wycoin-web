@@ -177,7 +177,7 @@ const CrudPortfolio = props => {
       </div>
       <div className="mb-3">
         <AvField
-          name="api_key"
+          name="apiKey"
           label={t("API Key")}
           className="form-control"
           placeholder={t("API Key")}
@@ -187,7 +187,7 @@ const CrudPortfolio = props => {
       </div>
       <div className="mb-3">
         <AvField
-          name="api_secret"
+          name="apiSecret"
           label={t("API Secret")}
           className="form-control"
           placeholder={t("API Secret")}
@@ -248,7 +248,7 @@ const CrudPortfolio = props => {
         </Nav>
         <div className="mb-3">
           <AvField
-            name="api_key"
+            name="apiKey"
             label={t("API Key")}
             className="form-control"
             placeholder={t("API Key")}
@@ -258,7 +258,7 @@ const CrudPortfolio = props => {
         </div>
         <div className="mb-3">
           <AvField
-            name="api_secret"
+            name="apiSecret"
             label={t("API Secret")}
             className="form-control"
             placeholder={t("API Secret")}
