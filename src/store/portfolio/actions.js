@@ -3,6 +3,7 @@ import {
   LOAD_USER_EXCHANGE,
   LOAD_EXCHANGE_TRANSACTIONS,
   ADD_CUSTOM_TRANSACTION,
+  LOAD_PORTFOLIO_COINS,
 } from "./actionTypes"
 
 export const addUserExchange = newExchange => {
@@ -28,6 +29,13 @@ export const loadUserExchanges = exchanges => {
 export const loadExchangeTransactions = data => {
   return {
     type: LOAD_EXCHANGE_TRANSACTIONS,
+    payload: data,
+  }
+}
+
+export const loadPortfolio = data => {
+  return {
+    type: LOAD_PORTFOLIO_COINS,
     payload: data,
   }
 }

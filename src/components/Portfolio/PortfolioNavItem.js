@@ -1,13 +1,16 @@
-import React from "react"
+import React, { useState } from "react"
 import { NavItem, NavLink } from "reactstrap"
 import { withTranslation } from "react-i18next"
 import classnames from "classnames"
 import { exchangeData } from "../../common/data/exchanges"
 
 const PortfolioNavItem = props => {
+  const [hovering, sethovering] = useState(false)
   return (
     <NavItem>
       <NavLink
+        onMouseEnter={() => sethovering(true)}
+        onMouseLeave={() => sethovering(false)}
         style={{ cursor: "pointer" }}
         className={classnames({
           active: props.isActive,
@@ -34,33 +37,35 @@ const PortfolioNavItem = props => {
           />
         )}
         {props.portfolio.title}
-        <div className="float-end">
-          {props.portfolio.exchange === "custom" && (
+        {hovering && (
+          <div className="float-end">
+            {props.portfolio.exchange === "custom" && (
+              <button
+                onClick={e => {
+                  props.onSettransactionAddingPortfolio(props.portfolio.id)
+                }}
+                className="btn btn-primary px-1 py-0 mx-1"
+                style={{ borderRadius: "50%" }}
+              >
+                <i className="mdi mdi-plus" />
+              </button>
+            )}
             <button
-              onClick={e => {
-                props.onSettransactionAddingPortfolio(props.portfolio.id)
-              }}
-              className="btn btn-primary px-1 py-0 mx-1"
+              onClick={e => {}}
+              className="btn btn-success px-1 py-0 mx-1"
               style={{ borderRadius: "50%" }}
             >
-              <i className="mdi mdi-plus" />
+              <i className="mdi mdi-pencil" />
             </button>
-          )}
-          <button
-            onClick={e => {}}
-            className="btn btn-success px-1 py-0 mx-1"
-            style={{ borderRadius: "50%" }}
-          >
-            <i className="mdi mdi-pencil" />
-          </button>
-          <button
-            onClick={e => {}}
-            className="btn btn-danger px-1 py-0 mx-1"
-            style={{ borderRadius: "50%" }}
-          >
-            <i className="mdi mdi-minus" />
-          </button>
-        </div>
+            <button
+              onClick={e => {}}
+              className="btn btn-danger px-1 py-0 mx-1"
+              style={{ borderRadius: "50%" }}
+            >
+              <i className="mdi mdi-minus" />
+            </button>
+          </div>
+        )}
       </NavLink>
     </NavItem>
   )

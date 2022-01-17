@@ -1,5 +1,14 @@
 import React from "react"
-import { Card, CardBody, Col, Row } from "reactstrap"
+import {
+  Card,
+  CardBody,
+  Col,
+  Row,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from "reactstrap"
 // datatable related plugins
 import { connect } from "react-redux"
 import BootstrapTable from "react-bootstrap-table-next"
@@ -11,7 +20,7 @@ import paginationFactory, {
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
 
-const TransactionTable = props => {
+const CoinTable = props => {
   const numberFormatter = cell => parseFloat(cell).toFixed(2)
   const moneyFormatter = cell => {
     if (localStorage.getItem("app_currency") == "eur")
@@ -34,39 +43,16 @@ const TransactionTable = props => {
       ),
     },
     {
-      dataField: "date",
-      text: props.t("Date"),
-      sort: true,
-    },
-    {
-      dataField: "pair",
-      text: props.t("Pair"),
-      sort: true,
-      isDummyField: true,
-      formatter: (cell, row) => row.coin + "/" + row.pair_coin,
-    },
-    {
       dataField: "quantity",
       text: props.t("Quantity"),
       sort: true,
       formatter: numberFormatter,
     },
     {
-      dataField: "amount",
-      text: props.t("Amount paid"),
+      dataField: "price",
+      text: props.t("Price"),
       sort: true,
       formatter: moneyFormatter,
-    },
-    {
-      dataField: "purchase_price",
-      text: props.t("Purchase Price"),
-      sort: true,
-      formatter: moneyFormatter,
-    },
-    {
-      dataField: "fees",
-      text: props.t("Fees"),
-      sort: true,
     },
     {
       dataField: "profit_lose_amount",
@@ -79,9 +65,36 @@ const TransactionTable = props => {
       ),
     },
     {
-      dataField: "current_value",
-      text: props.t("Current Value"),
+      dataField: "total",
+      text: props.t("Total"),
       formatter: moneyFormatter,
+    },
+    {
+      dataField: "action",
+      text: props.t("Action"),
+      isDummyField: true,
+      formatter: (cell, row) => (
+        <UncontrolledDropdown>
+          <DropdownToggle caret tag="button" className="btn">
+            <i className="mdi mdi-dots-horizontal" />
+          </DropdownToggle>
+          <DropdownMenu className={"dropdown-menu-end"}>
+            <DropdownItem
+              onClick={() => {
+                props.onViewTransactions(row.coin)
+              }}
+            >
+              {props.t("View Transactions")}
+            </DropdownItem>
+            {props.isCustom && (
+              <React.Fragment>
+                <DropdownItem>Modify</DropdownItem>
+                <DropdownItem>Delete</DropdownItem>
+              </React.Fragment>
+            )}
+          </DropdownMenu>
+        </UncontrolledDropdown>
+      ),
     },
   ]
   const defaultSorted = [
@@ -92,7 +105,7 @@ const TransactionTable = props => {
   ]
   const pageOptions = {
     sizePerPage: 10,
-    totalSize: props.transactions, // replace later with size(customers),
+    totalSize: props.coins, // replace later with size(customers),
     custom: true,
   }
   const { SearchBar } = Search
@@ -102,15 +115,15 @@ const TransactionTable = props => {
       <CardBody>
         <PaginationProvider
           pagination={paginationFactory(pageOptions)}
-          keyField="id"
+          keyField="coin"
           columns={columns}
-          data={props.transactions ?? []}
+          data={props.coins ?? []}
         >
           {({ paginationProps, paginationTableProps }) => (
             <ToolkitProvider
-              keyField="id"
+              keyField="coin"
               columns={columns}
-              data={props.transactions ?? []}
+              data={props.coins ?? []}
               search
             >
               {toolkitProps => (
@@ -129,9 +142,12 @@ const TransactionTable = props => {
 
                   <Row>
                     <Col xl="12">
-                      <div className="table-responsive">
+                      <div
+                        className="table-responsive"
+                        style={{ overflow: "unset" }}
+                      >
                         <BootstrapTable
-                          keyField={"id"}
+                          keyField={"coin"}
                           responsive
                           bordered={false}
                           striped={false}
@@ -164,9 +180,9 @@ const TransactionTable = props => {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    transactions: (
-      state.Portfolio.exchangeTransactions[ownProps.selectedExchangeId] || []
-    ).filter(el => el.coin == ownProps.selectedCoin),
+    coins:
+      (state.Portfolio.portfolioInfos[ownProps.selectedExchangeId] || {})
+        .coins || [],
   }
 }
-export default connect(mapStateToProps)(withTranslation()(TransactionTable))
+export default connect(mapStateToProps)(withTranslation()(CoinTable))

@@ -29,11 +29,11 @@ const exchangeData = [
     label: "Metamask",
     id: "metamask",
   },
-  {
-    img: "https://avatars.githubusercontent.com/u/9784193?s=200&v=4",
-    label: "Ledger",
-    id: "ledger",
-  },
+  // {
+  //   img: "https://avatars.githubusercontent.com/u/9784193?s=200&v=4",
+  //   label: "Ledger",
+  //   id: "ledger",
+  // },
 ]
 
 const howToAddData = {

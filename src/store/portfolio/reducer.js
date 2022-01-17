@@ -3,6 +3,7 @@ import {
   LOAD_USER_EXCHANGE,
   LOAD_EXCHANGE_TRANSACTIONS,
   ADD_CUSTOM_TRANSACTION,
+  LOAD_PORTFOLIO_COINS,
 } from "./actionTypes"
 
 import toastr from "toastr"
@@ -12,6 +13,7 @@ const initialState = {
   userExchanges: [],
   userExchangesLoaded: false,
   exchangeTransactions: {},
+  portfolioInfos: {},
 }
 
 const portfolio = (state = initialState, action) => {
@@ -40,6 +42,15 @@ const portfolio = (state = initialState, action) => {
         userExchanges: [...action.payload],
         userExchangesLoaded: true,
       }
+      break
+    case LOAD_PORTFOLIO_COINS:
+      newState = { ...state.portfolioInfos }
+      newState[action.payload.id] = action.payload.data
+      state = {
+        ...state,
+        portfolioInfos: newState,
+      }
+      break
     case LOAD_EXCHANGE_TRANSACTIONS:
       newState = { ...state.exchangeTransactions }
       newState[action.payload.id] = action.payload.transactions
@@ -47,6 +58,7 @@ const portfolio = (state = initialState, action) => {
         ...state,
         exchangeTransactions: newState,
       }
+      break
     default:
       state = { ...state }
       break

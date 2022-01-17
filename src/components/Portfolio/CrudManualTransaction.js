@@ -13,8 +13,6 @@ import { AvForm, AvField, AvInput } from "availity-reactstrap-validation"
 import { connect } from "react-redux"
 import { withTranslation } from "react-i18next"
 import { del, get, post } from "../../helpers/api_helper"
-import toastr from "toastr"
-import "toastr/build/toastr.min.css"
 import { addCustomTransaction } from "../../store/actions"
 
 const CrudManualTransaction = props => {
