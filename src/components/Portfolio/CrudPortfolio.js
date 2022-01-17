@@ -4,7 +4,6 @@ import { AvForm, AvField, AvInput } from "availity-reactstrap-validation"
 import { connect } from "react-redux"
 
 import { AutoSizer, List } from "react-virtualized"
-import Select from "react-select"
 // datatable related plugins
 import { useTranslation } from "react-i18next"
 // Web3
@@ -13,6 +12,8 @@ import { InjectedConnector } from "@web3-react/injected-connector"
 import { exchangeData, howToAddData } from "../../common/data/exchanges"
 import icons from "../../common/data/materialdesign-icons"
 import { del, get, post, axiosApi } from "../../helpers/api_helper"
+import ReactSelect from "react-select"
+import Select from "../Common/Select"
 import toastr from "toastr"
 import "toastr/build/toastr.min.css"
 import {
@@ -377,47 +378,26 @@ const CrudPortfolio = props => {
         >
           <label>{t("Cryptocurrency")}</label>
           <Select
-            theme={theme => ({
-              ...theme,
-              borderRadius: 0,
-              colors: {
-                ...theme.colors,
-                text: "orangered",
-                neutral0: "#32394e",
-                neutral20: "#32394e",
-                neutral30: "var(--input-color)",
-                neutral80: "var(--input-color)",
-              },
-            })}
             options={coins_list}
-            filterOption={() => true}
-            onInputChange={e => {
-              if (e == "") return
-              if (metamask_crypto_input) clearTimeout(metamask_crypto_input)
-              metamask_crypto_input = setTimeout(() => {
-                get("/search/networks?search=" + e).then(({ data }) => {
-                  setcoins_list(
-                    data.map(dat => {
-                      return {
-                        value: dat.connectionId,
-                        label: (
-                          <div>
-                            <img
-                              src={
-                                "data:image/png;base64, " + dat.blockchain.icon
-                              }
-                              height="30px"
-                              width="30px"
-                            />{" "}
-                            {dat.blockchain.name}
-                          </div>
-                        ),
-                      }
-                    })
-                  )
+            searchUrl="/search/networks?search="
+            afterSearch={data => {
+              setcoins_list(
+                data.map(dat => {
+                  return {
+                    value: dat.connectionId,
+                    label: (
+                      <div>
+                        <img
+                          src={"data:image/png;base64, " + dat.blockchain.icon}
+                          height="30px"
+                          width="30px"
+                        />{" "}
+                        {dat.blockchain.name}
+                      </div>
+                    ),
+                  }
                 })
-                metamask_crypto_input = false
-              }, 1000)
+              )
             }}
             onChange={({ value }) => {
               setselected_metamask_chainId(value)
@@ -534,7 +514,7 @@ const CrudPortfolio = props => {
             )}
             <div>
               <label>{t("Cryptocurrency")}</label>
-              <Select
+              <ReactSelect
                 options={[
                   {
                     value: "1",
