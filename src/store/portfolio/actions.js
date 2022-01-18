@@ -4,6 +4,8 @@ import {
   LOAD_EXCHANGE_TRANSACTIONS,
   ADD_CUSTOM_TRANSACTION,
   LOAD_PORTFOLIO_COINS,
+  REMOVE_PORTFOLIO,
+  UPDATE_PORTFOLIO,
 } from "./actionTypes"
 
 export const addUserExchange = newExchange => {
@@ -36,6 +38,20 @@ export const loadExchangeTransactions = data => {
 export const loadPortfolio = data => {
   return {
     type: LOAD_PORTFOLIO_COINS,
+    payload: data,
+  }
+}
+
+export const removePortfolio = data => {
+  return {
+    type: REMOVE_PORTFOLIO,
+    payload: data,
+  }
+}
+
+export const updatePortfolio = data => {
+  return {
+    type: UPDATE_PORTFOLIO,
     payload: data,
   }
 }

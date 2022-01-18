@@ -126,7 +126,7 @@ const CrudManualTransaction = props => {
                         )
                       }}
                       onChange={({ value }) => {
-                        setcoin(value.s)
+                        setcoin(value.i)
                         setcoin_label(value.n)
                         setcoin_img(value.ic)
                       }}
@@ -170,7 +170,7 @@ const CrudManualTransaction = props => {
                         )
                       }}
                       onChange={({ value }) => {
-                        setpair_coin(value.s)
+                        setpair_coin(value.i)
                       }}
                     />
                     <AvField

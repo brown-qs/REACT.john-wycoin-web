@@ -105,7 +105,7 @@ const CoinTable = props => {
   ]
   const pageOptions = {
     sizePerPage: 10,
-    totalSize: props.coins, // replace later with size(customers),
+    totalSize: props.coins.length, // replace later with size(customers),
     custom: true,
   }
   const { SearchBar } = Search

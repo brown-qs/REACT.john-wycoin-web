@@ -7,10 +7,12 @@ import { exchangeData } from "../../common/data/exchanges"
 const PortfolioNavItem = props => {
   const [hovering, sethovering] = useState(false)
   return (
-    <NavItem>
+    <NavItem
+      className={"d-flex justify-content-between"}
+      onMouseEnter={() => sethovering(true)}
+      onMouseLeave={() => sethovering(false)}
+    >
       <NavLink
-        onMouseEnter={() => sethovering(true)}
-        onMouseLeave={() => sethovering(false)}
         style={{ cursor: "pointer" }}
         className={classnames({
           active: props.isActive,
@@ -37,36 +39,40 @@ const PortfolioNavItem = props => {
           />
         )}
         {props.portfolio.title}
-        {hovering && (
-          <div className="float-end">
-            {props.portfolio.exchange === "custom" && (
-              <button
-                onClick={e => {
-                  props.onSettransactionAddingPortfolio(props.portfolio.id)
-                }}
-                className="btn btn-primary px-1 py-0 mx-1"
-                style={{ borderRadius: "50%" }}
-              >
-                <i className="mdi mdi-plus" />
-              </button>
-            )}
-            <button
-              onClick={e => {}}
-              className="btn btn-success px-1 py-0 mx-1"
-              style={{ borderRadius: "50%" }}
-            >
-              <i className="mdi mdi-pencil" />
-            </button>
-            <button
-              onClick={e => {}}
-              className="btn btn-danger px-1 py-0 mx-1"
-              style={{ borderRadius: "50%" }}
-            >
-              <i className="mdi mdi-minus" />
-            </button>
-          </div>
-        )}
       </NavLink>
+      {hovering && (
+        <div>
+          {props.portfolio.exchange === "custom" && (
+            <button
+              onClick={e => {
+                props.onSettransactionAddingPortfolio(props.portfolio.id)
+              }}
+              className="btn btn-primary px-1 py-0 mx-1"
+              style={{ borderRadius: "50%" }}
+            >
+              <i className="mdi mdi-plus" />
+            </button>
+          )}
+          <button
+            onClick={e => {
+              props.onEdit()
+            }}
+            className="btn btn-success px-1 py-0 mx-1"
+            style={{ borderRadius: "50%" }}
+          >
+            <i className="mdi mdi-pencil" />
+          </button>
+          <button
+            onClick={e => {
+              props.onDelete()
+            }}
+            className="btn btn-danger px-1 py-0 mx-1"
+            style={{ borderRadius: "50%" }}
+          >
+            <i className="mdi mdi-minus" />
+          </button>
+        </div>
+      )}
     </NavItem>
   )
 }

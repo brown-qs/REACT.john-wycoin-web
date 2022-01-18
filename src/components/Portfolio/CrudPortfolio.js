@@ -20,14 +20,43 @@ import {
   addUserExchange,
   loadUserExchanges,
   loadExchangeTransactions,
+  updatePortfolio,
 } from "../../store/actions"
 
 const CrudPortfolio = props => {
   useImperativeHandle(props.refTo, () => {
-    return { setmodal_add_portfolio }
+    return { setmodal_add_portfolio, edit_portfolio }
   })
 
   const { t } = useTranslation()
+
+  const edit_portfolio = port => {
+    seteditingPortfolio(port.id)
+
+    if (port.exchange == "custom") {
+      setaddingExchange({ id: "custom" })
+      setaddFormDefaultValues({
+        title: port.title,
+      })
+      setmanual_portfolio_icon(port.metadata.icon)
+      setcolorRgb(port.metadata.color)
+      setmodal_manual_portfolio(true)
+    } else {
+      let exchange = exchangeData.find(ex => ex.id == port.exchange)
+      setaddingExchange(exchange)
+      setmodal_connect_exchange(true)
+
+      setaddFormDefaultValues({
+        title: port.title,
+        ...port.metadata,
+      })
+
+      setexactAddingMethod(exchange.id)
+      if (exchange.id == "metamask") {
+        setFormCountMetamaskManual(1)
+      }
+    }
+  }
 
   const [modal_add_portfolio, setmodal_add_portfolio] = useState(false)
   const [modal_select_exchange, setmodal_select_exchange] = useState(false)
@@ -48,13 +77,14 @@ const CrudPortfolio = props => {
   // Manual Portfolio
   const [modal_manual_portfolio, setmodal_manual_portfolio] = useState(false)
   const [modal_icon_menu, setmodal_icon_menu] = useState(false)
-  const [manual_portfolio_icon, setmanual_portfolio_icon] = useState(
-    "briefcase-variant-outline"
-  )
+  const [manual_portfolio_icon, setmanual_portfolio_icon] = useState(null)
   const [metamask_mode, setmetamask_mode] = useState(0)
   const [coins_list, setcoins_list] = useState([])
   const [walletConnected, setwalletConnected] = useState(false)
   const [colorRgb, setcolorRgb] = useState("")
+  const [addFormDefaultValues, setaddFormDefaultValues] = useState(null)
+  const [editingPortfolio, seteditingPortfolio] = useState(null)
+
   const metamaskConnector = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 56],
   })
@@ -82,25 +112,48 @@ const CrudPortfolio = props => {
     const title = values.title
     delete values.title
 
-    post("add-portfolio", {
-      exchange: addingExchange.id,
-      title,
-      metadata: values,
-    }).then(({ data, success, errors }) => {
-      if (success) {
-        props.addUserExchange(data)
-        if (addingExchange.id === "custom") {
-          setmodal_manual_portfolio(false)
-          props.onManualPortfolioCreated(data.id)
+    if (editingPortfolio == null) {
+      post("add-portfolio", {
+        exchange: addingExchange.id,
+        title,
+        metadata: values,
+      }).then(({ data, success, errors }) => {
+        if (success) {
+          props.addUserExchange(data)
+          if (addingExchange.id === "custom") {
+            setmodal_manual_portfolio(false)
+            props.onManualPortfolioCreated(data.id)
+          } else {
+            setmodal_connect_exchange(false)
+          }
         } else {
-          setmodal_connect_exchange(false)
+          for (const group in errors) {
+            errors[group].map(msg => toastr.warning(msg))
+          }
         }
-      } else {
-        for (const group in errors) {
-          errors[group].map(msg => toastr.warning(msg))
+      })
+    } else {
+      post("update-portfolio", {
+        exchange: addingExchange.id,
+        portfolioId: editingPortfolio,
+        title,
+        metadata: values,
+      }).then(({ data, success, errors }) => {
+        if (success) {
+          props.updatePortfolio({ id: editingPortfolio, data })
+          props.onUpdatePortfolio(editingPortfolio)
+          if (addingExchange.id === "custom") {
+            setmodal_manual_portfolio(false)
+          } else {
+            setmodal_connect_exchange(false)
+          }
+        } else {
+          for (const group in errors) {
+            errors[group].map(msg => toastr.warning(msg))
+          }
         }
-      }
-    })
+      })
+    }
   }
 
   let windowObjectReference = null
@@ -164,7 +217,7 @@ const CrudPortfolio = props => {
       onValidSubmit={(e, v) => {
         handleAddExchange(e, v)
       }}
-      model={{ title: addingExchange.label }}
+      model={addFormDefaultValues}
     >
       <div className="mb-3">
         <AvField
@@ -204,8 +257,6 @@ const CrudPortfolio = props => {
     </AvForm>
   )
 
-  let metamask_crypto_input = ""
-
   const apiAddForms = {
     binance: defaultAddForm,
     gate_io: defaultAddForm,
@@ -217,7 +268,7 @@ const CrudPortfolio = props => {
         onValidSubmit={(e, v) => {
           handleAddExchange(e, v)
         }}
-        model={{ title: addingExchange.label, mode: "api_sync" }}
+        model={addFormDefaultValues}
       >
         <div className="mb-3">
           <AvField
@@ -280,6 +331,7 @@ const CrudPortfolio = props => {
         onValidSubmit={(e, v) => {
           handleAddExchange(e, v)
         }}
+        model={addFormDefaultValues}
       >
         <div className="mb-3">
           <AvField
@@ -334,7 +386,7 @@ const CrudPortfolio = props => {
         onValidSubmit={(e, v) => {
           handleAddExchange(e, v)
         }}
-        model={{ title: addingExchange.label }}
+        model={addFormDefaultValues}
       >
         <Nav pills className="navtab-bg nav-justified mb-5">
           <NavItem>
@@ -470,7 +522,7 @@ const CrudPortfolio = props => {
         onValidSubmit={(e, v) => {
           handleAddExchange(e, v)
         }}
-        model={{ title: addingExchange.label, mode: "manual" }}
+        model={addFormDefaultValues}
       >
         <AvField name="mode" type="hidden" required />
         <div>
@@ -614,7 +666,11 @@ const CrudPortfolio = props => {
         }}
       >
         <div className="modal-header">
-          <h5 className="modal-title mx-auto">{t("Add a portfolio")}</h5>
+          <h5 className="modal-title mx-auto">
+            {editingPortfolio === null
+              ? t("Add a portfolio")
+              : t("Edit a portfolio")}
+          </h5>
         </div>
         <div className="modal-body">
           <button
@@ -637,6 +693,11 @@ const CrudPortfolio = props => {
             onClick={() => {
               setmodal_add_portfolio(false)
               setaddingExchange({ id: "custom" })
+              setaddFormDefaultValues({
+                title: t("Custom portfolio"),
+              })
+              setcolorRgb("#556ee6")
+              setmanual_portfolio_icon("briefcase-variant-outline")
               setmodal_manual_portfolio(true)
             }}
           >
@@ -675,11 +736,25 @@ const CrudPortfolio = props => {
                 style={{ overflow: "hidden" }}
                 onClick={() => {
                   setmodal_select_exchange(false)
+                  // Add Dialog
+                  seteditingPortfolio(null)
                   setmodal_connect_exchange(true)
                   setaddingExchange(exchangeData[i])
                   setexactAddingMethod(exchangeData[i].id)
+
                   if (exchangeData[i].id == "metamask") {
                     setFormCountMetamaskManual(1)
+                    setaddFormDefaultValues({
+                      title: exchangeData[i].label,
+                      chain_id: "",
+                      wallet_address: "",
+                    })
+                  } else {
+                    setaddFormDefaultValues({
+                      title: exchangeData[i].label,
+                      apiKey: "",
+                      apiSecret: "",
+                    })
                   }
                 }}
               >
@@ -704,15 +779,17 @@ const CrudPortfolio = props => {
         }}
       >
         <div className="modal-header">
-          <button
-            className="btn btn-link"
-            onClick={() => {
-              setmodal_manual_portfolio(false)
-              setmodal_add_portfolio(true)
-            }}
-          >
-            <i className="bx bx-left-arrow-alt float-start text-primary h4 m-0"></i>
-          </button>
+          {editingPortfolio === null && (
+            <button
+              className="btn btn-link"
+              onClick={() => {
+                setmodal_manual_portfolio(false)
+                setmodal_add_portfolio(true)
+              }}
+            >
+              <i className="bx bx-left-arrow-alt float-start text-primary h4 m-0"></i>
+            </button>
+          )}
           <h5 className="modal-title mx-auto">{t("Add a manual portfolio")}</h5>
         </div>
         <div className="modal-body">
@@ -721,7 +798,7 @@ const CrudPortfolio = props => {
             onValidSubmit={(e, v) => {
               handleAddExchange(e, v)
             }}
-            model={{ title: t("Custom portfolio"), color: "#556ee6" }}
+            model={addFormDefaultValues}
           >
             <div className="col-6">
               <AvField
@@ -822,7 +899,7 @@ const CrudPortfolio = props => {
                   <input
                     className="p-0 h-100"
                     type="color"
-                    defaultValue="#556ee6"
+                    defaultValue={colorRgb}
                     onChange={e => {
                       setcolorRgb(e.target.value)
                     }}
@@ -839,7 +916,7 @@ const CrudPortfolio = props => {
             </div>
             <div className="mt-4 d-grid">
               <button className="btn btn-primary btn-block " type="submit">
-                {t("Next")}
+                {editingPortfolio === null ? t("Next") : t("Save")}
               </button>
             </div>
           </AvForm>
@@ -858,15 +935,17 @@ const CrudPortfolio = props => {
           {addingExchange && (
             <div className="col-6">
               <div className="p-3">
-                <button
-                  className="btn btn-link position-absolute p-0"
-                  onClick={() => {
-                    setmodal_connect_exchange(false)
-                    setmodal_select_exchange(true)
-                  }}
-                >
-                  <i className="bx bx-left-arrow-alt text-primary h2"></i>
-                </button>
+                {editingPortfolio === null && (
+                  <button
+                    className="btn btn-link position-absolute p-0"
+                    onClick={() => {
+                      setmodal_connect_exchange(false)
+                      setmodal_select_exchange(true)
+                    }}
+                  >
+                    <i className="bx bx-left-arrow-alt text-primary h2"></i>
+                  </button>
+                )}
                 <h4 className="modal-title text-center">{t("Connect API")}</h4>
                 <p className="text-center mt-3">
                   <img src={addingExchange.img} width="20" />{" "}
@@ -908,4 +987,5 @@ export default connect(mapStateToProps, {
   addUserExchange,
   loadUserExchanges,
   loadExchangeTransactions,
+  updatePortfolio,
 })(CrudPortfolio)

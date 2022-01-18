@@ -25,7 +25,7 @@ const exchangeData = [
     id: "kraken",
   },
   {
-    img: "https://metamask.io/images/favicon.png",
+    img: "https://metamask.io/icons/icon-48x48.png?v=48400a28770e10dd52a8c0e539aeb282",
     label: "Metamask",
     id: "metamask",
   },

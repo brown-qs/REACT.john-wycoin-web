@@ -14,9 +14,13 @@ import {
   DropdownMenu,
   Nav,
   Row,
+  Modal,
 } from "reactstrap"
 import { connect } from "react-redux"
 import { withTranslation } from "react-i18next"
+import BlockUi from "react-block-ui"
+import SweetAlert from "react-bootstrap-sweetalert"
+import "react-block-ui/style.css"
 
 import { exchangeData, howToAddData } from "../common/data/exchanges"
 // Web3
@@ -26,6 +30,7 @@ import {
   loadUserExchanges,
   loadExchangeTransactions,
   loadPortfolio,
+  removePortfolio,
 } from "../store/actions"
 import CrudPortfolio from "../components/Portfolio/CrudPortfolio"
 import CrudManualTransaction from "../components/Portfolio/CrudManualTransaction"
@@ -36,35 +41,44 @@ import CoinTable from "../components/Portfolio/CoinTable"
 const Portfolio = props => {
   useEffect(() => {
     if (props.exchangesLoaded === false) {
+      setisPortfolioListLoading(true)
       get("get-portfolios").then(({ data }) => {
         props.loadUserExchanges(data)
+        setisPortfolioListLoading(false)
       })
     }
+    setInterval(loadPortfolio, 1000 * 60)
   }, [])
 
-  const [selectedExchangeId, setselectedExchangeId] = useState("1")
+  const [selectedExchangeId, setselectedExchangeId] = useState(null)
   const [selectedCoin, setselectedCoin] = useState("1")
   const [transactionAddingPortfolio, settransactionAddingPortfolio] =
     useState(0)
-
+  const [isPortfolioListLoading, setisPortfolioListLoading] = useState(false)
   const [isPortfolioFilterOpen, setisPortfolioFilterOpen] = useState(false)
   const [selectedPortfolioFilter, setselectedPortfolioFilter] = useState("all")
+  const [deletingPortfolio, setdeletingPortfolio] = useState(null)
   const [tableView, settableView] = useState("coin")
 
-  const toggleExchange = tab => {
-    if (selectedExchangeId !== tab) {
+  const loadPortfolio = tab => {
+    if (tab == undefined) tab = selectedExchangeId
+    if (tab == null) return
+    get("load-portfolio-coins/" + tab).then(({ data }) => {
+      props.loadPortfolio({ id: tab, data })
+    })
+    get("load-portfolio-transactions/" + tab).then(({ data }) => {
+      props.loadExchangeTransactions({
+        id: tab,
+        transactions: data,
+      })
+    })
+  }
+
+  const toggleExchange = (tab, force = false) => {
+    if (selectedExchangeId !== tab || force) {
       setselectedExchangeId(tab)
       settableView("coin")
-      if (!props.portfolioInfos[tab]) {
-        get("load-portfolio-coins/" + tab).then(({ data }) => {
-          props.loadPortfolio({ id: tab, data })
-        })
-      }
-      if (!props.transactions[tab]) {
-        get("load-portfolio-transactions/" + tab).then(({ data }) => {
-          props.loadExchangeTransactions({ id: tab, transactions: data })
-        })
-      }
+      loadPortfolio(tab)
     }
   }
   const crudPortfolio = useRef()
@@ -105,189 +119,231 @@ const Portfolio = props => {
           </Row>
           <Row>
             <Col md={3}>
-              <Card>
-                <CardHeader>
-                  {/*Adding Manual Transaction*/}
-                  <div className="d-flex justify-content-between">
-                    <span>{props.t("Total")}: </span>
-                    <span className="text-primary h2 float-end">
-                      {moneyFormatter(
-                        (props.portfolioInfos[selectedExchangeId] || {})
-                          .total || "0"
-                      )}
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <span>{props.t("Profit/Loss")}: </span>
-                    <span
-                      className={`text-${
-                        ((props.portfolioInfos[selectedExchangeId] || {})
-                          .profit || "0") >= 0
-                          ? "success"
-                          : "danger"
-                      } float-end`}
-                    >
-                      {moneyFormatter(
-                        (props.portfolioInfos[selectedExchangeId] || {})
-                          .profit || "0"
-                      )}
-                    </span>{" "}
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <CardTitle className="h4">
-                    <Dropdown
-                      className="w-100"
-                      isOpen={isPortfolioFilterOpen}
-                      toggle={() => {
-                        setisPortfolioFilterOpen(!isPortfolioFilterOpen)
-                      }}
-                    >
-                      <DropdownToggle
-                        className="btn w-100 text-start"
-                        caret
-                        tag="button"
+              <BlockUi tag="div" blocking={isPortfolioListLoading}>
+                <Card>
+                  <CardHeader>
+                    {/*Adding Manual Transaction*/}
+                    <div className="d-flex justify-content-between">
+                      <span>{props.t("Total")}: </span>
+                      <span className="text-primary h2 float-end">
+                        {moneyFormatter(
+                          (props.portfolioInfos[selectedExchangeId] || {})
+                            .total || "0"
+                        )}
+                      </span>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <span>{props.t("Profit/Loss")}: </span>
+                      <span
+                        className={`text-${
+                          ((props.portfolioInfos[selectedExchangeId] || {})
+                            .profit || "0") >= 0
+                            ? "success"
+                            : "danger"
+                        } float-end`}
                       >
-                        {selectedPortfolioFilter == "all" && (
-                          <React.Fragment>
-                            <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
-                            {props.t("All exchanges")}
-                          </React.Fragment>
+                        {moneyFormatter(
+                          (props.portfolioInfos[selectedExchangeId] || {})
+                            .profit || "0"
                         )}
-                        {selectedPortfolioFilter == "custom" && (
-                          <React.Fragment>
-                            <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
-                            {props.t("Custom")}
-                          </React.Fragment>
-                        )}
-                        {selectedPortfolioFilter != "all" &&
-                          selectedPortfolioFilter != "custom" && (
+                      </span>{" "}
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <CardTitle className="h4">
+                      <Dropdown
+                        className="w-100"
+                        isOpen={isPortfolioFilterOpen}
+                        toggle={() => {
+                          setisPortfolioFilterOpen(!isPortfolioFilterOpen)
+                        }}
+                      >
+                        <DropdownToggle
+                          className="btn w-100 text-start"
+                          caret
+                          tag="button"
+                        >
+                          {selectedPortfolioFilter == "all" && (
                             <React.Fragment>
-                              <img
-                                className="me-2"
-                                src={
-                                  exchangeData.find(
-                                    exData =>
-                                      exData.id == selectedPortfolioFilter
-                                  ).img
-                                }
-                                width={30}
-                                height={30}
-                              />
-                              {props.t(
-                                exchangeData.find(
-                                  exData => exData.id == selectedPortfolioFilter
-                                ).label
-                              )}
+                              <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
+                              {props.t("All exchanges")}
                             </React.Fragment>
                           )}
-                        <i className="mdi mdi-chevron-down float-end" />
-                      </DropdownToggle>
-                      <DropdownMenu
-                        style={{ minWidth: "auto" }}
-                        className="w-100"
-                      >
-                        <DropdownItem
-                          onClick={() => {
-                            setselectedPortfolioFilter("all")
-                          }}
-                          className={`${
-                            isPortfolioFilterOpen === "all" ? "active" : "none"
-                          }`}
-                        >
-                          <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
-                          {props.t("All exchanges")}
-                        </DropdownItem>
-                        {exchangeData.map(
-                          ex =>
-                            props.exchanges.find(
-                              ({ exchange }) => exchange == ex.id
-                            ) && (
-                              <DropdownItem
-                                key={ex.id}
-                                onClick={() => {
-                                  setselectedPortfolioFilter(ex.id)
-                                }}
-                                className={`${
-                                  isPortfolioFilterOpen === ex.id
-                                    ? "active"
-                                    : "none"
-                                }`}
-                              >
+                          {selectedPortfolioFilter == "custom" && (
+                            <React.Fragment>
+                              <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
+                              {props.t("Custom")}
+                            </React.Fragment>
+                          )}
+                          {selectedPortfolioFilter != "all" &&
+                            selectedPortfolioFilter != "custom" && (
+                              <React.Fragment>
                                 <img
                                   className="me-2"
-                                  src={ex.img}
+                                  src={
+                                    exchangeData.find(
+                                      exData =>
+                                        exData.id == selectedPortfolioFilter
+                                    ).img
+                                  }
                                   width={30}
                                   height={30}
                                 />
-                                {props.t(ex.label)}
-                              </DropdownItem>
-                            )
-                        )}
-                        <DropdownItem
-                          onClick={() => {
-                            setselectedPortfolioFilter("custom")
-                          }}
-                          className={`${
-                            isPortfolioFilterOpen === "custom"
-                              ? "active"
-                              : "none"
-                          }`}
+                                {props.t(
+                                  exchangeData.find(
+                                    exData =>
+                                      exData.id == selectedPortfolioFilter
+                                  ).label
+                                )}
+                              </React.Fragment>
+                            )}
+                          <i className="mdi mdi-chevron-down float-end" />
+                        </DropdownToggle>
+                        <DropdownMenu
+                          style={{ minWidth: "auto" }}
+                          className="w-100"
                         >
-                          <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
-                          {props.t("Custom")}
-                        </DropdownItem>
-                      </DropdownMenu>
-                    </Dropdown>
-                  </CardTitle>
-                </CardBody>
-                <Nav tabs className="flex-column nav-tabs-custom mb-3">
-                  {props.exchanges.map(
-                    ex =>
-                      (selectedPortfolioFilter == "all" ||
-                        selectedPortfolioFilter == ex.exchange) && (
-                        <PortfolioNavItem
-                          isActive={selectedExchangeId === ex.id}
-                          key={ex.id}
-                          onToggleExchange={() => {
-                            toggleExchange(ex.id)
-                          }}
-                          onSettransactionAddingPortfolio={() => {
-                            settransactionAddingPortfolio(ex.id)
-                            crudManualTransaction.current.setmodal_manual_add_transaction(
-                              true
-                            )
-                          }}
-                          portfolio={ex}
-                        />
-                      )
-                  )}
-                </Nav>
-              </Card>
+                          <DropdownItem
+                            onClick={() => {
+                              setselectedPortfolioFilter("all")
+                            }}
+                            className={`${
+                              isPortfolioFilterOpen === "all"
+                                ? "active"
+                                : "none"
+                            }`}
+                          >
+                            <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
+                            {props.t("All exchanges")}
+                          </DropdownItem>
+                          {exchangeData.map(
+                            ex =>
+                              props.exchanges.find(
+                                ({ exchange }) => exchange == ex.id
+                              ) && (
+                                <DropdownItem
+                                  key={ex.id}
+                                  onClick={() => {
+                                    setselectedPortfolioFilter(ex.id)
+                                  }}
+                                  className={`${
+                                    isPortfolioFilterOpen === ex.id
+                                      ? "active"
+                                      : "none"
+                                  }`}
+                                >
+                                  <img
+                                    className="me-2"
+                                    src={ex.img}
+                                    width={30}
+                                    height={30}
+                                  />
+                                  {props.t(ex.label)}
+                                </DropdownItem>
+                              )
+                          )}
+                          <DropdownItem
+                            onClick={() => {
+                              setselectedPortfolioFilter("custom")
+                            }}
+                            className={`${
+                              isPortfolioFilterOpen === "custom"
+                                ? "active"
+                                : "none"
+                            }`}
+                          >
+                            <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
+                            {props.t("Custom")}
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
+                    </CardTitle>
+                  </CardBody>
+                  {deletingPortfolio != null ? (
+                    <SweetAlert
+                      title="Are you sure?"
+                      warning
+                      showCancel
+                      confirmButtonText="Yes, delete it!"
+                      confirmBtnBsStyle="success"
+                      cancelBtnBsStyle="danger"
+                      onConfirm={() => {
+                        props.removePortfolio(deletingPortfolio)
+                        post("delete-portfolio", {
+                          id: deletingPortfolio,
+                        })
+                        setdeletingPortfolio(null)
+                        if (selectedExchangeId == deletingPortfolio)
+                          setselectedExchangeId(null)
+                      }}
+                      onCancel={() => setdeletingPortfolio(null)}
+                    >
+                      You won&apos;t be able to revert this!
+                    </SweetAlert>
+                  ) : null}
+                  <Nav tabs className="flex-column nav-tabs-custom mb-3">
+                    {props.exchanges.map(
+                      ex =>
+                        (selectedPortfolioFilter == "all" ||
+                          selectedPortfolioFilter == ex.exchange) && (
+                          <PortfolioNavItem
+                            isActive={selectedExchangeId === ex.id}
+                            key={ex.id}
+                            onToggleExchange={() => {
+                              toggleExchange(ex.id)
+                            }}
+                            onSettransactionAddingPortfolio={() => {
+                              settransactionAddingPortfolio(ex.id)
+                              crudManualTransaction.current.setmodal_manual_add_transaction(
+                                true
+                              )
+                            }}
+                            onEdit={() => {
+                              crudPortfolio.current.edit_portfolio(ex)
+                            }}
+                            onDelete={() => {
+                              setdeletingPortfolio(ex.id)
+                            }}
+                            portfolio={ex}
+                          />
+                        )
+                    )}
+                  </Nav>
+                </Card>
+              </BlockUi>
             </Col>
             <Col md={9}>
-              {tableView == "transaction" && (
-                <TransactionTable
-                  selectedExchangeId={selectedExchangeId}
-                  selectedCoin={selectedCoin}
-                />
-              )}
-              {tableView == "coin" && (
-                <CoinTable
-                  selectedExchangeId={selectedExchangeId}
-                  onViewTransactions={coin => {
-                    settableView("transaction")
-                    setselectedCoin(coin)
-                  }}
-                  isCustom={
-                    (
-                      (props.exchanges || []).find(
-                        ({ id }) => id == selectedExchangeId
-                      ) || {}
-                    ).exchange == "custom"
-                  }
-                />
-              )}
+              <BlockUi
+                tag="div"
+                blocking={
+                  selectedExchangeId != null &&
+                  (props.transactions[selectedExchangeId] == undefined ||
+                    props.portfolioInfos[selectedExchangeId] == undefined)
+                }
+              >
+                {tableView == "transaction" && (
+                  <TransactionTable
+                    selectedExchangeId={selectedExchangeId}
+                    selectedCoin={selectedCoin}
+                  />
+                )}
+                {tableView == "coin" && (
+                  <CoinTable
+                    selectedExchangeId={selectedExchangeId}
+                    onViewTransactions={coin => {
+                      settableView("transaction")
+                      setselectedCoin(coin)
+                    }}
+                    isCustom={
+                      (
+                        (props.exchanges || []).find(
+                          ({ id }) => id == selectedExchangeId
+                        ) || {}
+                      ).exchange == "custom"
+                    }
+                  />
+                )}
+              </BlockUi>
             </Col>
           </Row>
         </Container>
@@ -297,6 +353,9 @@ const Portfolio = props => {
             settransactionAddingPortfolio(portfolioId)
             toggleExchange(portfolioId)
             crudManualTransaction.current.setmodal_manual_add_transaction(true)
+          }}
+          onUpdatePortfolio={portfolioId => {
+            toggleExchange(portfolioId, true)
           }}
         />
         <CrudManualTransaction
@@ -321,4 +380,5 @@ export default connect(mapStateToProps, {
   loadUserExchanges,
   loadExchangeTransactions,
   loadPortfolio,
+  removePortfolio,
 })(withTranslation()(Portfolio))

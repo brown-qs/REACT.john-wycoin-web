@@ -92,7 +92,7 @@ const TransactionTable = props => {
   ]
   const pageOptions = {
     sizePerPage: 10,
-    totalSize: props.transactions, // replace later with size(customers),
+    totalSize: props.transactions.length, // replace later with size(customers),
     custom: true,
   }
   const { SearchBar } = Search
