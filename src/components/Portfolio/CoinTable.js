@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Card,
   CardBody,
@@ -17,10 +17,15 @@ import paginationFactory, {
   PaginationListStandalone,
   SizePerPageDropdownStandalone,
 } from "react-bootstrap-table2-paginator"
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit"
+import ToolkitProvider, {
+  Search,
+  ColumnToggle,
+} from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
 
 const CoinTable = props => {
+  const { ToggleList } = ColumnToggle
+
   const numberFormatter = cell => parseFloat(cell).toFixed(2)
   const moneyFormatter = cell => {
     if (localStorage.getItem("app_currency") == "eur")
@@ -41,6 +46,7 @@ const CoinTable = props => {
           <span className="text-secondary">{row.coin}</span>
         </div>
       ),
+      filterValue: (cell, row) => row.coin_label + row.coin,
     },
     {
       dataField: "quantity",
@@ -63,6 +69,7 @@ const CoinTable = props => {
           {moneyFormatter(cell)}
         </span>
       ),
+      filterValue: (cell, row) => moneyFormatter(cell),
     },
     {
       dataField: "total",
@@ -97,6 +104,50 @@ const CoinTable = props => {
       ),
     },
   ]
+
+  const CustomToggleList = ({ columns, onColumnToggle, toggles }) => (
+    <React.Fragment>
+      <div className="btn-group ms-2">
+        <UncontrolledDropdown>
+          <DropdownToggle caret tag="button" className="btn btn-outline-light">
+            <i className="mdi mdi-eye-off-outline"></i>
+          </DropdownToggle>
+          <DropdownMenu>
+            {columns
+              .map(column => ({
+                ...column,
+                toggle: toggles[column.dataField],
+              }))
+              .map(column => (
+                <DropdownItem
+                  key={column.dataField}
+                  onClick={() => onColumnToggle(column.dataField)}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={column.toggle}
+                    readOnly
+                  />{" "}
+                  {column.text}
+                </DropdownItem>
+              ))}
+          </DropdownMenu>
+        </UncontrolledDropdown>
+        <button
+          type="button"
+          className="btn btn-outline-light"
+          onClick={() => {
+            columns.map(column => {
+              toggles[column.dataField] || onColumnToggle(column.dataField)
+            })
+          }}
+        >
+          <i className="mdi mdi-eye-outline"></i>
+        </button>
+      </div>
+    </React.Fragment>
+  )
   const defaultSorted = [
     {
       dataField: "coins",
@@ -109,6 +160,7 @@ const CoinTable = props => {
     custom: true,
   }
   const { SearchBar } = Search
+  console.log(columns)
 
   return (
     <Card>
@@ -125,12 +177,14 @@ const CoinTable = props => {
               columns={columns}
               data={props.coins ?? []}
               search
+              columnToggle
             >
               {toolkitProps => (
                 <React.Fragment>
                   <div className="d-flex justify-content-between">
                     <div className="d-inline">
                       <SizePerPageDropdownStandalone {...paginationProps} />
+                      <CustomToggleList {...toolkitProps.columnToggleProps} />
                     </div>
                     <div className="search-box me-2 mb-2 d-inline-block">
                       <div className="position-relative">

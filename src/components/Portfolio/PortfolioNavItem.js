@@ -24,8 +24,7 @@ const PortfolioNavItem = props => {
         {props.portfolio.exchange === "custom" && (
           <i
             className={
-              "h5 me-1 mdi mdi-" +
-              (props.portfolio.metadata.icon ?? "briefcase-variant-outline")
+              "h5 me-1 " + (props.portfolio.metadata.icon ?? "fas fa-briefcase")
             }
             style={{ color: props.portfolio.metadata.color }}
           ></i>

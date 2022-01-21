@@ -10,12 +10,13 @@ import { useTranslation } from "react-i18next"
 import { InjectedConnector } from "@web3-react/injected-connector"
 //Import Breadcrumb
 import { exchangeData, howToAddData } from "../../common/data/exchanges"
-import icons from "../../common/data/materialdesign-icons"
+import icons from "../../common/data/fontawesome-icons"
 import { del, get, post, axiosApi } from "../../helpers/api_helper"
 import ReactSelect from "react-select"
 import Select from "../Common/Select"
 import toastr from "toastr"
 import "toastr/build/toastr.min.css"
+import BlockUi from "react-block-ui"
 import {
   addUserExchange,
   loadUserExchanges,
@@ -85,6 +86,8 @@ const CrudPortfolio = props => {
   const [addFormDefaultValues, setaddFormDefaultValues] = useState(null)
   const [editingPortfolio, seteditingPortfolio] = useState(null)
 
+  const [loadingAdd, setloadingAdd] = useState(false)
+
   const metamaskConnector = new InjectedConnector({
     supportedChainIds: [1, 3, 4, 5, 42, 56],
   })
@@ -112,34 +115,36 @@ const CrudPortfolio = props => {
     const title = values.title
     delete values.title
 
+    setloadingAdd(true)
     if (editingPortfolio == null) {
       post("add-portfolio", {
         exchange: addingExchange.id,
         title,
         metadata: values,
-      }).then(({ data, success, errors }) => {
-        if (success) {
+      })
+        .then(({ data }) => {
+          setloadingAdd(false)
           props.addUserExchange(data)
+          props.onAddPortfolio(data.id)
           if (addingExchange.id === "custom") {
             setmodal_manual_portfolio(false)
             props.onManualPortfolioCreated(data.id)
           } else {
             setmodal_connect_exchange(false)
           }
-        } else {
-          for (const group in errors) {
-            errors[group].map(msg => toastr.warning(msg))
-          }
-        }
-      })
+        })
+        .catch(() => {
+          setloadingAdd(false)
+        })
     } else {
       post("update-portfolio", {
         exchange: addingExchange.id,
         portfolioId: editingPortfolio,
         title,
         metadata: values,
-      }).then(({ data, success, errors }) => {
-        if (success) {
+      })
+        .then(({ data }) => {
+          setloadingAdd(false)
           props.updatePortfolio({ id: editingPortfolio, data })
           props.onUpdatePortfolio(editingPortfolio)
           if (addingExchange.id === "custom") {
@@ -147,12 +152,10 @@ const CrudPortfolio = props => {
           } else {
             setmodal_connect_exchange(false)
           }
-        } else {
-          for (const group in errors) {
-            errors[group].map(msg => toastr.warning(msg))
-          }
-        }
-      })
+        })
+        .catch(() => {
+          setloadingAdd(false)
+        })
     }
   }
 
@@ -284,7 +287,12 @@ const CrudPortfolio = props => {
         <Nav pills className="navtab-bg nav-justified">
           <NavItem>
             <NavLink style={{ cursor: "pointer" }} className="active">
-              {t("API Sync")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("API Sync")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
           <NavItem>
@@ -294,7 +302,12 @@ const CrudPortfolio = props => {
                 setexactAddingMethod("coinbase_auto")
               }}
             >
-              {t("Auto")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Auto")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
         </Nav>
@@ -355,12 +368,22 @@ const CrudPortfolio = props => {
                 setexactAddingMethod("coinbase")
               }}
             >
-              {t("API Sync")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("API Sync")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink style={{ cursor: "pointer" }} className="active">
-              {t("Auto")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Auto")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
         </Nav>
@@ -397,7 +420,12 @@ const CrudPortfolio = props => {
                 setmetamask_mode(0)
               }}
             >
-              {t("Auto")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Auto")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
           <NavItem>
@@ -410,7 +438,12 @@ const CrudPortfolio = props => {
                 setwalletConnected(false)
               }}
             >
-              {t("Manual")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Manual")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
         </Nav>
@@ -451,6 +484,9 @@ const CrudPortfolio = props => {
                 })
               )
             }}
+            value={coins_list.filter(function (option) {
+              return option.value === selected_metamask_chainId
+            })}
             onChange={({ value }) => {
               setselected_metamask_chainId(value)
             }}
@@ -495,7 +531,8 @@ const CrudPortfolio = props => {
                         1: "rxxoewu0X8",
                         56: "binacesmartchain",
                       }
-                      setselected_metamask_chainId(walletChainIds[res]) // res is 0x1
+                      console.log(res)
+                      setselected_metamask_chainId(walletChainIds[Number(res)]) // res is 0x1
                     })
                   })
                   .catch(error => {
@@ -543,12 +580,22 @@ const CrudPortfolio = props => {
                 setexactAddingMethod("metamask")
               }}
             >
-              {t("Auto")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Auto")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
           <NavItem>
             <NavLink style={{ cursor: "pointer" }} className="active">
-              {t("Manual")}
+              <span className="d-none d-sm-block">
+                <i className="fas fa-home"></i> {t("Manual")}
+              </span>
+              <span className="d-block d-sm-none">
+                <i className="fas fa-home"></i>
+              </span>
             </NavLink>
           </NavItem>
         </Nav>
@@ -601,6 +648,7 @@ const CrudPortfolio = props => {
               <AvField
                 name="chain_id"
                 type="hidden"
+                readOnly
                 value={selected_metamask_chainId}
               ></AvField>
             </div>
@@ -649,7 +697,7 @@ const CrudPortfolio = props => {
               setmodal_icon_menu(false)
             }}
           >
-            <i className={"h1 mdi mdi-" + icon}></i>
+            <i className={"font-size-24 " + icon}></i>
           </button>
         ))}
       </div>
@@ -659,7 +707,6 @@ const CrudPortfolio = props => {
     <React.Fragment>
       <Modal
         isOpen={modal_add_portfolio}
-        centered={true}
         size="sm"
         toggle={() => {
           setmodal_add_portfolio(false)
@@ -697,7 +744,7 @@ const CrudPortfolio = props => {
                 title: t("Custom portfolio"),
               })
               setcolorRgb("#556ee6")
-              setmanual_portfolio_icon("briefcase-variant-outline")
+              setmanual_portfolio_icon("fas fa-briefcase")
               setmodal_manual_portfolio(true)
             }}
           >
@@ -710,7 +757,6 @@ const CrudPortfolio = props => {
       {/*Select Exchange*/}
       <Modal
         isOpen={modal_select_exchange}
-        centered={true}
         toggle={() => {
           setmodal_select_exchange(false)
         }}
@@ -773,7 +819,6 @@ const CrudPortfolio = props => {
       {/*Manual start*/}
       <Modal
         isOpen={modal_manual_portfolio}
-        centered={true}
         toggle={() => {
           setmodal_manual_portfolio(false)
         }}
@@ -820,13 +865,13 @@ const CrudPortfolio = props => {
                 required
               />
               <button
-                className="btn btn-link"
+                className="btn"
                 onClick={e => {
                   e.preventDefault()
                   setmodal_icon_menu(true)
                 }}
               >
-                <i className={"h4 mdi mdi-" + manual_portfolio_icon}></i>
+                <i className={"font-size-24 " + manual_portfolio_icon}></i>
               </button>
             </div>
             <Modal
@@ -872,9 +917,7 @@ const CrudPortfolio = props => {
                                             setmodal_icon_menu(false)
                                           }}
                                         >
-                                          <i
-                                            className={"h1 mdi mdi-" + icon}
-                                          ></i>
+                                          <i className={"h1 " + icon}></i>
                                         </button>
                                       ))}
                                   </div>
@@ -925,51 +968,54 @@ const CrudPortfolio = props => {
       {/*Connect Exchange*/}
       <Modal
         isOpen={modal_connect_exchange}
-        centered={true}
         size="lg"
         toggle={() => {
           setmodal_connect_exchange(false)
         }}
       >
-        <div className="row">
-          {addingExchange && (
-            <div className="col-6">
-              <div className="p-3">
-                {editingPortfolio === null && (
-                  <button
-                    className="btn btn-link position-absolute p-0"
-                    onClick={() => {
-                      setmodal_connect_exchange(false)
-                      setmodal_select_exchange(true)
-                    }}
-                  >
-                    <i className="bx bx-left-arrow-alt text-primary h2"></i>
-                  </button>
-                )}
-                <h4 className="modal-title text-center">{t("Connect API")}</h4>
-                <p className="text-center mt-3">
-                  <img src={addingExchange.img} width="20" />{" "}
-                  {addingExchange.label}
-                </p>
-                {apiAddForms[exactAddingMethod]}
-              </div>
-            </div>
-          )}
-          {howToAddData[exactAddingMethod] && (
-            <div className="col-6 bg-light">
-              <div className="modal-header border-0 mt-2">
-                <h5>{howToAddData[exactAddingMethod].heading}</h5>
-              </div>
-              <div className="modal-body">
-                {howToAddData[exactAddingMethod].steps.map((step, i) => (
-                  <p key={i}>
-                    <span className="text-danger">{i + 1}.</span> {t(step)}
+        <BlockUi tag="div" blocking={loadingAdd}>
+          <div className="row">
+            {addingExchange && (
+              <div className="col-6">
+                <div className="p-3">
+                  {editingPortfolio === null && (
+                    <button
+                      className="btn btn-link position-absolute p-0"
+                      onClick={() => {
+                        setmodal_connect_exchange(false)
+                        setmodal_select_exchange(true)
+                      }}
+                    >
+                      <i className="bx bx-left-arrow-alt text-primary h2"></i>
+                    </button>
+                  )}
+                  <h4 className="modal-title text-center">
+                    {t("Connect API")}
+                  </h4>
+                  <p className="text-center mt-3">
+                    <img src={addingExchange.img} width="20" />{" "}
+                    {addingExchange.label}
                   </p>
-                ))}
+                  {apiAddForms[exactAddingMethod]}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+            {howToAddData[exactAddingMethod] && (
+              <div className="col-6 bg-light">
+                <div className="modal-header border-0 mt-2">
+                  <h5>{howToAddData[exactAddingMethod].heading}</h5>
+                </div>
+                <div className="modal-body">
+                  {howToAddData[exactAddingMethod].steps.map((step, i) => (
+                    <p key={i}>
+                      <span className="text-danger">{i + 1}.</span> {t(step)}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </BlockUi>
       </Modal>
     </React.Fragment>
   )

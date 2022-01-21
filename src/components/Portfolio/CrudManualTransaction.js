@@ -15,6 +15,10 @@ import { withTranslation } from "react-i18next"
 import { del, get, post } from "../../helpers/api_helper"
 import { addCustomTransaction } from "../../store/actions"
 
+//Import Flatepicker
+import "flatpickr/dist/themes/material_blue.css"
+import Flatpickr from "react-flatpickr"
+
 const CrudManualTransaction = props => {
   useImperativeHandle(props.refTo, () => {
     return { setmodal_manual_add_transaction }
@@ -33,15 +37,13 @@ const CrudManualTransaction = props => {
   const [pair_coin, setpair_coin] = useState("")
   const [coin_label, setcoin_label] = useState("")
   const [coin_img, setcoin_img] = useState("")
+  const [transactionDate, settransactionDate] = useState("")
 
-  let coinSearchTimer1 = false
-  let coinSearchTimer2 = false
   let addMore = false
   return (
     <React.Fragment>
       <Modal
         isOpen={modal_manual_add_transaction}
-        centered={true}
         size="lg"
         toggle={() => {
           setmodal_manual_add_transaction(false)
@@ -62,7 +64,12 @@ const CrudManualTransaction = props => {
                   setmanual_add_transaction_mode(0)
                 }}
               >
-                {props.t("Buy")}
+                <span className="d-none d-sm-block">
+                  <i className="fas fa-home"></i> {props.t("Buy")}
+                </span>
+                <span className="d-block d-sm-none">
+                  <i className="fas fa-home"></i>
+                </span>
               </NavLink>
             </NavItem>
             <NavItem>
@@ -73,7 +80,12 @@ const CrudManualTransaction = props => {
                   setmanual_add_transaction_mode(1)
                 }}
               >
-                {props.t("ICO")}
+                <span className="d-none d-sm-block">
+                  <i className="fas fa-home"></i> {props.t("ICO")}
+                </span>
+                <span className="d-block d-sm-none">
+                  <i className="fas fa-home"></i>
+                </span>
               </NavLink>
             </NavItem>
           </Nav>
@@ -247,11 +259,28 @@ const CrudManualTransaction = props => {
                 </InputGroup>
               </div>
               <div className="col-sm-6 mt-3">
+                <label>{props.t("On what date?")}</label>
+                <InputGroup>
+                  <Flatpickr
+                    className="form-control d-block"
+                    placeholder="dd M,yyyy"
+                    options={{
+                      altInput: true,
+                      altFormat: "F j, Y",
+                      dateFormat: "Y-m-d",
+                    }}
+                    onChange={date => settransactionDate(date)}
+                  />
+                  {/* <DatePicker
+                    selected={transactionDate}
+                    onChange={date => settransactionDate(date)}
+                  /> */}
+                </InputGroup>
+
                 <AvField
                   name="date"
-                  className="form-control"
-                  type="date"
-                  label={props.t("On what date?")}
+                  value={transactionDate}
+                  type="hidden"
                   required
                 />
               </div>

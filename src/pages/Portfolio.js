@@ -171,7 +171,7 @@ const Portfolio = props => {
                           )}
                           {selectedPortfolioFilter == "custom" && (
                             <React.Fragment>
-                              <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
+                              <i className="mdi mdi-fas fa-briefcase h2 text-primary me-2"></i>{" "}
                               {props.t("Custom")}
                             </React.Fragment>
                           )}
@@ -252,7 +252,7 @@ const Portfolio = props => {
                                 : "none"
                             }`}
                           >
-                            <i className="mdi mdi-briefcase-variant-outline h2 text-primary me-2"></i>{" "}
+                            <i className="mdi mdi-fas fa-briefcase h2 text-primary me-2"></i>{" "}
                             {props.t("Custom")}
                           </DropdownItem>
                         </DropdownMenu>
@@ -351,8 +351,10 @@ const Portfolio = props => {
           refTo={crudPortfolio}
           onManualPortfolioCreated={portfolioId => {
             settransactionAddingPortfolio(portfolioId)
-            toggleExchange(portfolioId)
             crudManualTransaction.current.setmodal_manual_add_transaction(true)
+          }}
+          onAddPortfolio={portfolioId => {
+            toggleExchange(portfolioId)
           }}
           onUpdatePortfolio={portfolioId => {
             toggleExchange(portfolioId, true)
