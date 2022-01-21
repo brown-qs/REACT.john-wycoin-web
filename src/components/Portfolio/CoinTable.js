@@ -22,6 +22,7 @@ import ToolkitProvider, {
   ColumnToggle,
 } from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
+import "../../assets/scss/custom/plugins/datatable.scss"
 
 const CoinTable = props => {
   const { ToggleList } = ColumnToggle
@@ -95,8 +96,13 @@ const CoinTable = props => {
             </DropdownItem>
             {props.isCustom && (
               <React.Fragment>
-                <DropdownItem>Modify</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <DropdownItem
+                  onClick={() => {
+                    props.onDeleteCoin(row.coin)
+                  }}
+                >
+                  Delete
+                </DropdownItem>
               </React.Fragment>
             )}
           </DropdownMenu>
@@ -160,8 +166,6 @@ const CoinTable = props => {
     custom: true,
   }
   const { SearchBar } = Search
-  console.log(columns)
-
   return (
     <Card>
       <CardBody>

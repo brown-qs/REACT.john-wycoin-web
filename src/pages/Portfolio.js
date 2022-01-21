@@ -31,6 +31,7 @@ import {
   loadExchangeTransactions,
   loadPortfolio,
   removePortfolio,
+  removeTransactions,
 } from "../store/actions"
 import CrudPortfolio from "../components/Portfolio/CrudPortfolio"
 import CrudManualTransaction from "../components/Portfolio/CrudManualTransaction"
@@ -58,6 +59,8 @@ const Portfolio = props => {
   const [isPortfolioFilterOpen, setisPortfolioFilterOpen] = useState(false)
   const [selectedPortfolioFilter, setselectedPortfolioFilter] = useState("all")
   const [deletingPortfolio, setdeletingPortfolio] = useState(null)
+  const [deletingCoin, setdeletingCoin] = useState(null)
+  const [deletingTransaction, setdeletingTransaction] = useState(null)
   const [tableView, settableView] = useState("coin")
 
   const loadPortfolio = tab => {
@@ -77,9 +80,9 @@ const Portfolio = props => {
   const toggleExchange = (tab, force = false) => {
     if (selectedExchangeId !== tab || force) {
       setselectedExchangeId(tab)
-      settableView("coin")
       loadPortfolio(tab)
     }
+    settableView("coin")
   }
   const crudPortfolio = useRef()
   const crudManualTransaction = useRef()
@@ -166,12 +169,12 @@ const Portfolio = props => {
                           {selectedPortfolioFilter == "all" && (
                             <React.Fragment>
                               <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
-                              {props.t("All exchanges")}
+                              {props.t("All Portfolios")}
                             </React.Fragment>
                           )}
                           {selectedPortfolioFilter == "custom" && (
                             <React.Fragment>
-                              <i className="mdi mdi-fas fa-briefcase h2 text-primary me-2"></i>{" "}
+                              <i className="fas fa-briefcase font-size-24 text-primary me-2"></i>{" "}
                               {props.t("Custom")}
                             </React.Fragment>
                           )}
@@ -186,8 +189,8 @@ const Portfolio = props => {
                                         exData.id == selectedPortfolioFilter
                                     ).img
                                   }
-                                  width={30}
-                                  height={30}
+                                  width={25}
+                                  height={25}
                                 />
                                 {props.t(
                                   exchangeData.find(
@@ -214,7 +217,7 @@ const Portfolio = props => {
                             }`}
                           >
                             <i className="bx bxs-bar-chart-alt-2 h2 text-primary me-2"></i>{" "}
-                            {props.t("All exchanges")}
+                            {props.t("All Portfolios")}
                           </DropdownItem>
                           {exchangeData.map(
                             ex =>
@@ -235,8 +238,8 @@ const Portfolio = props => {
                                   <img
                                     className="me-2"
                                     src={ex.img}
-                                    width={30}
-                                    height={30}
+                                    width={25}
+                                    height={25}
                                   />
                                   {props.t(ex.label)}
                                 </DropdownItem>
@@ -252,7 +255,7 @@ const Portfolio = props => {
                                 : "none"
                             }`}
                           >
-                            <i className="mdi mdi-fas fa-briefcase h2 text-primary me-2"></i>{" "}
+                            <i className="fas fa-briefcase font-size-24 text-primary me-2"></i>{" "}
                             {props.t("Custom")}
                           </DropdownItem>
                         </DropdownMenu>
@@ -321,18 +324,81 @@ const Portfolio = props => {
                     props.portfolioInfos[selectedExchangeId] == undefined)
                 }
               >
+                {deletingTransaction != null ? (
+                  <SweetAlert
+                    title="Are you sure?"
+                    warning
+                    showCancel
+                    confirmButtonText="Yes, delete it!"
+                    confirmBtnBsStyle="success"
+                    cancelBtnBsStyle="danger"
+                    onConfirm={() => {
+                      let removingTransactions = [deletingTransaction]
+                      props.removeTransactions({
+                        portfolio: selectedExchangeId,
+                        transactions: removingTransactions,
+                      })
+                      post("/transaction/delete", {
+                        transactions: [deletingTransaction.id],
+                      })
+                      setdeletingTransaction(null)
+                    }}
+                    onCancel={() => setdeletingTransaction(null)}
+                  >
+                    You won&apos;t be able to revert this!
+                  </SweetAlert>
+                ) : null}
                 {tableView == "transaction" && (
                   <TransactionTable
                     selectedExchangeId={selectedExchangeId}
                     selectedCoin={selectedCoin}
+                    isCustom={
+                      (
+                        (props.exchanges || []).find(
+                          ({ id }) => id == selectedExchangeId
+                        ) || {}
+                      ).exchange == "custom"
+                    }
+                    onDeleteTransaction={transaction => {
+                      setdeletingTransaction(transaction)
+                    }}
                   />
                 )}
+                {deletingCoin != null ? (
+                  <SweetAlert
+                    title="Are you sure?"
+                    warning
+                    showCancel
+                    confirmButtonText="Yes, delete it!"
+                    confirmBtnBsStyle="success"
+                    cancelBtnBsStyle="danger"
+                    onConfirm={() => {
+                      let removingTransactions = (
+                        props.transactions[selectedExchangeId] || []
+                      ).filter(el => el.coin == deletingCoin)
+                      props.removeTransactions({
+                        portfolio: selectedExchangeId,
+                        transactions: removingTransactions,
+                      })
+                      post("/transaction/delete", {
+                        transactions: removingTransactions.map(tr => tr.id),
+                      })
+                      setdeletingCoin(null)
+                    }}
+                    onCancel={() => setdeletingCoin(null)}
+                  >
+                    You won&apos;t be able to revert this!
+                  </SweetAlert>
+                ) : null}
                 {tableView == "coin" && (
                   <CoinTable
                     selectedExchangeId={selectedExchangeId}
                     onViewTransactions={coin => {
                       settableView("transaction")
                       setselectedCoin(coin)
+                    }}
+                    onDeleteCoin={coin => {
+                      setdeletingCoin(coin)
                     }}
                     isCustom={
                       (
@@ -383,4 +449,5 @@ export default connect(mapStateToProps, {
   loadExchangeTransactions,
   loadPortfolio,
   removePortfolio,
+  removeTransactions,
 })(withTranslation()(Portfolio))

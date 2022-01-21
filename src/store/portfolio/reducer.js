@@ -6,6 +6,7 @@ import {
   LOAD_PORTFOLIO_COINS,
   REMOVE_PORTFOLIO,
   UPDATE_PORTFOLIO,
+  REMOVE_TRANSACTIONS,
 } from "./actionTypes"
 
 import toastr from "toastr"
@@ -80,6 +81,29 @@ const portfolio = (state = initialState, action) => {
       state = {
         ...state,
         userExchanges: newState,
+      }
+      break
+    }
+    case REMOVE_TRANSACTIONS: {
+      let coin = action.payload.transactions[0].coin
+      newState = { ...state.exchangeTransactions }
+      newState[action.payload.portfolio] = newState[
+        action.payload.portfolio
+      ].filter(tr => !action.payload.transactions.includes(tr))
+      let newPortoflioInfos = { ...state.portfolioInfos }
+      if (
+        (newState[action.payload.portfolio] || []).filter(el => el.coin == coin)
+          .length == 0
+      ) {
+        let coins = [...newPortoflioInfos[action.payload.portfolio].coins]
+        let index = coins.findIndex(co => co.coin == coin)
+        coins.splice(index, 1)
+        newPortoflioInfos[action.payload.portfolio].coins = coins
+      }
+      state = {
+        ...state,
+        exchangeTransactions: newState,
+        portfolioInfos: newPortoflioInfos,
       }
       break
     }

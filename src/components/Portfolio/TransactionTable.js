@@ -1,5 +1,14 @@
 import React from "react"
-import { Card, CardBody, Col, Row } from "reactstrap"
+import {
+  Card,
+  CardBody,
+  Col,
+  Row,
+  UncontrolledDropdown,
+  DropdownToggle,
+  DropdownItem,
+  DropdownMenu,
+} from "reactstrap"
 // datatable related plugins
 import { connect } from "react-redux"
 import BootstrapTable from "react-bootstrap-table-next"
@@ -8,11 +17,16 @@ import paginationFactory, {
   PaginationListStandalone,
   SizePerPageDropdownStandalone,
 } from "react-bootstrap-table2-paginator"
-import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit"
+import ToolkitProvider, {
+  Search,
+  ColumnToggle,
+} from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
+import moment from "moment"
 
 const TransactionTable = props => {
   const numberFormatter = cell => parseFloat(cell).toFixed(2)
+  const quantityFormatter = cell => parseFloat(cell).toFixed(6)
   const moneyFormatter = cell => {
     if (localStorage.getItem("app_currency") == "eur")
       cell =
@@ -32,11 +46,16 @@ const TransactionTable = props => {
           <span className="text-secondary">{row.coin}</span>
         </div>
       ),
+      filterValue: (cell, row) => row.coin_label + row.coin,
     },
     {
       dataField: "date",
       text: props.t("Date"),
       sort: true,
+      formatter: cell => {
+        return moment(cell).format("YYYY/MM/DD - HH:mm")
+      },
+      filterValue: (cell, row) => moment(cell).format("YYYY/MM/DD - HH:mm"),
     },
     {
       dataField: "pair",
@@ -44,18 +63,21 @@ const TransactionTable = props => {
       sort: true,
       isDummyField: true,
       formatter: (cell, row) => row.coin + "/" + row.pair_coin,
+      filterValue: (cell, row) => row.coin + "/" + row.pair_coin,
     },
     {
       dataField: "quantity",
       text: props.t("Quantity"),
       sort: true,
-      formatter: numberFormatter,
+      formatter: quantityFormatter,
     },
     {
       dataField: "amount",
       text: props.t("Amount paid"),
       sort: true,
-      formatter: moneyFormatter,
+      formatter: cell => (
+        <span className="text-warning">{moneyFormatter(cell)}</span>
+      ),
     },
     {
       dataField: "purchase_price",
@@ -81,9 +103,79 @@ const TransactionTable = props => {
     {
       dataField: "current_value",
       text: props.t("Current Value"),
-      formatter: moneyFormatter,
+      formatter: cell => (
+        <span className="text-primary">{moneyFormatter(cell)}</span>
+      ),
+    },
+    {
+      dataField: "action",
+      text: props.t("Action"),
+      isDummyField: true,
+      hidden: !props.isCustom,
+      formatter: (cell, row) => (
+        <UncontrolledDropdown>
+          <DropdownToggle caret tag="button" className="btn">
+            <i className="mdi mdi-dots-horizontal" />
+          </DropdownToggle>
+          <DropdownMenu className={"dropdown-menu-end"}>
+            <DropdownItem onClick={() => {}}>{props.t("Modify")}</DropdownItem>
+            <React.Fragment>
+              <DropdownItem
+                onClick={() => {
+                  props.onDeleteTransaction(row)
+                }}
+              >
+                {props.t("Delete")}
+              </DropdownItem>
+            </React.Fragment>
+          </DropdownMenu>
+        </UncontrolledDropdown>
+      ),
     },
   ]
+  const CustomToggleList = ({ columns, onColumnToggle, toggles }) => (
+    <React.Fragment>
+      <div className="btn-group ms-2">
+        <UncontrolledDropdown>
+          <DropdownToggle caret tag="button" className="btn btn-outline-light">
+            <i className="mdi mdi-eye-off-outline"></i>
+          </DropdownToggle>
+          <DropdownMenu>
+            {columns
+              .map(column => ({
+                ...column,
+                toggle: toggles[column.dataField],
+              }))
+              .map(column => (
+                <DropdownItem
+                  key={column.dataField}
+                  onClick={() => onColumnToggle(column.dataField)}
+                >
+                  <input
+                    type="checkbox"
+                    className="form-check-input"
+                    checked={column.toggle}
+                    readOnly
+                  />{" "}
+                  {column.text}
+                </DropdownItem>
+              ))}
+          </DropdownMenu>
+        </UncontrolledDropdown>
+        <button
+          type="button"
+          className="btn btn-outline-light"
+          onClick={() => {
+            columns.map(column => {
+              toggles[column.dataField] || onColumnToggle(column.dataField)
+            })
+          }}
+        >
+          <i className="mdi mdi-eye-outline"></i>
+        </button>
+      </div>
+    </React.Fragment>
+  )
   const defaultSorted = [
     {
       dataField: "coins",
@@ -112,12 +204,14 @@ const TransactionTable = props => {
               columns={columns}
               data={props.transactions ?? []}
               search
+              columnToggle
             >
               {toolkitProps => (
                 <React.Fragment>
                   <div className="d-flex justify-content-between">
                     <div className="d-inline">
                       <SizePerPageDropdownStandalone {...paginationProps} />
+                      <CustomToggleList {...toolkitProps.columnToggleProps} />
                     </div>
                     <div className="search-box me-2 mb-2 d-inline-block">
                       <div className="position-relative">
@@ -129,7 +223,10 @@ const TransactionTable = props => {
 
                   <Row>
                     <Col xl="12">
-                      <div className="table-responsive">
+                      <div
+                        className="table-responsive"
+                        style={{ overflow: "unset" }}
+                      >
                         <BootstrapTable
                           keyField={"id"}
                           responsive

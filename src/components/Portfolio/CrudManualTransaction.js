@@ -202,14 +202,14 @@ const CrudManualTransaction = props => {
                     <InputGroup>
                       <input
                         type="text"
-                        value="asdfsdf"
+                        defaultValue={"Ex: Bitcoin"}
                         name="ico_coin_label"
                         className="form-control"
                         style={{ width: "70%" }}
                       />
                       <input
                         type="text"
-                        value="asdfsdf"
+                        defaultValue={"Ex: BTC"}
                         name="ico_coin"
                         className="form-control"
                         style={{ width: "30%" }}

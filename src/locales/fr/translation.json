@@ -46,7 +46,7 @@
   "Logout": "Déconnexion",
 
   "Exchanges": "Exchanges",
-  "All exchanges": "Tous les exchanges",
+  "All Portfolios": "Tous les exchanges",
   "Add a portfolio": "Ajoute un portefeuille",
   "Synchronise an Exchange/Wallet": "Synchroniser un Exchange/Wallet",
   "Add manually": "Ajouter manuellement",
@@ -63,7 +63,7 @@
   "Pair": "Paire",
   "Quantity": "Quantité",
   "Amount paid": "Montant payé",
-  "Purchase at": "Achat à",
+  "Purchase Price": "Achat à",
   "Fees": "Frais",
   "Profit/Loss": "Profit/Perte",
   "Current Value": "Valeur actuelle",
