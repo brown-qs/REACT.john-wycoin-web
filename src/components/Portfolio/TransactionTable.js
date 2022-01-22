@@ -98,12 +98,9 @@ const TransactionTable = props => {
       filterValue: (cell, row) => moment(cell).format("YYYY/MM/DD - HH:mm"),
     },
     {
-      dataField: "pair",
+      dataField: "pair_coin",
       text: props.t("Pair"),
       sort: true,
-      isDummyField: true,
-      formatter: (cell, row) => row.coin + "/" + row.pair_coin,
-      filterValue: (cell, row) => row.coin + "/" + row.pair_coin,
     },
     {
       dataField: "quantity",
