@@ -1,10 +1,11 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Card,
   CardBody,
   Col,
   Row,
   UncontrolledDropdown,
+  Dropdown,
   DropdownToggle,
   DropdownItem,
   DropdownMenu,
@@ -23,17 +24,9 @@ import ToolkitProvider, {
 } from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
 import moment from "moment"
+import { numberFormatter, moneyFormatter } from "../../helpers/utils"
 
 const TransactionTable = props => {
-  const numberFormatter = cell => parseFloat(cell).toFixed(2)
-  const quantityFormatter = cell => parseFloat(cell).toFixed(6)
-  const moneyFormatter = cell => {
-    if (localStorage.getItem("app_currency") == "eur")
-      cell =
-        parseFloat(cell / localStorage.getItem("eur_rate")).toFixed(2) + " €"
-    else cell = parseFloat(cell).toFixed(2) + " $"
-    return cell
-  }
   const columns = [
     {
       dataField: "coins",
@@ -41,12 +34,19 @@ const TransactionTable = props => {
       sort: true,
       isDummyField: true,
       formatter: (cell, row) => (
-        <div>
-          <img src={row.coin_img} width="30" /> <span>{row.coin_label}</span>{" "}
+        <React.Fragment>
+          <img src={row.coin_img} width="30" /> {row.coin_label}{" "}
           <span className="text-secondary">{row.coin}</span>
-        </div>
+        </React.Fragment>
       ),
       filterValue: (cell, row) => row.coin_label + row.coin,
+      style: (colum, colIndex) => {
+        return {
+          width: "10%",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }
+      },
     },
     {
       dataField: "date",
@@ -69,7 +69,7 @@ const TransactionTable = props => {
       dataField: "quantity",
       text: props.t("Quantity"),
       sort: true,
-      formatter: quantityFormatter,
+      formatter: numberFormatter,
     },
     {
       dataField: "amount",
@@ -113,23 +113,27 @@ const TransactionTable = props => {
       isDummyField: true,
       hidden: !props.isCustom,
       formatter: (cell, row) => (
-        <UncontrolledDropdown>
-          <DropdownToggle caret tag="button" className="btn">
-            <i className="mdi mdi-dots-horizontal" />
-          </DropdownToggle>
-          <DropdownMenu className={"dropdown-menu-end"}>
-            <DropdownItem onClick={() => {}}>{props.t("Modify")}</DropdownItem>
-            <React.Fragment>
-              <DropdownItem
-                onClick={() => {
-                  props.onDeleteTransaction(row)
-                }}
-              >
-                {props.t("Delete")}
+        <React.Fragment>
+          <UncontrolledDropdown>
+            <DropdownToggle caret tag="button" className="btn">
+              <i className="mdi mdi-dots-horizontal" />
+            </DropdownToggle>
+            <DropdownMenu className={"dropdown-menu-end"} container1="body">
+              <DropdownItem onClick={() => {}}>
+                {props.t("Modify")}
               </DropdownItem>
-            </React.Fragment>
-          </DropdownMenu>
-        </UncontrolledDropdown>
+              <React.Fragment>
+                <DropdownItem
+                  onClick={() => {
+                    props.onDeleteTransaction(row)
+                  }}
+                >
+                  {props.t("Delete")}
+                </DropdownItem>
+              </React.Fragment>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+        </React.Fragment>
       ),
     },
   ]
@@ -223,10 +227,7 @@ const TransactionTable = props => {
 
                   <Row>
                     <Col xl="12">
-                      <div
-                        className="table-responsive"
-                        style={{ overflow: "unset" }}
-                      >
+                      <div className="table-responsive">
                         <BootstrapTable
                           keyField={"id"}
                           responsive

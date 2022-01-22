@@ -917,7 +917,9 @@ const CrudPortfolio = props => {
                                             setmodal_icon_menu(false)
                                           }}
                                         >
-                                          <i className={"h1 " + icon}></i>
+                                          <i
+                                            className={"font-size-24 " + icon}
+                                          ></i>
                                         </button>
                                       ))}
                                   </div>

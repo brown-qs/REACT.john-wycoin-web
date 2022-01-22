@@ -23,18 +23,10 @@ import ToolkitProvider, {
 } from "react-bootstrap-table2-toolkit"
 import { withTranslation } from "react-i18next"
 import "../../assets/scss/custom/plugins/datatable.scss"
+import { numberFormatter, moneyFormatter } from "../../helpers/utils"
 
 const CoinTable = props => {
   const { ToggleList } = ColumnToggle
-
-  const numberFormatter = cell => parseFloat(cell).toFixed(2)
-  const moneyFormatter = cell => {
-    if (localStorage.getItem("app_currency") == "eur")
-      cell =
-        parseFloat(cell / localStorage.getItem("eur_rate")).toFixed(2) + " €"
-    else cell = parseFloat(cell).toFixed(2) + " $"
-    return cell
-  }
   const columns = [
     {
       dataField: "coins",
@@ -110,7 +102,6 @@ const CoinTable = props => {
       ),
     },
   ]
-
   const CustomToggleList = ({ columns, onColumnToggle, toggles }) => (
     <React.Fragment>
       <div className="btn-group ms-2">
@@ -154,18 +145,22 @@ const CoinTable = props => {
       </div>
     </React.Fragment>
   )
+  const [zeroShow, setzeroShow] = useState(true)
   const defaultSorted = [
     {
       dataField: "coins",
       order: "asc",
     },
   ]
+  const coinsShown = props.coins.filter(coin => zeroShow || coin.quantity > 0)
+
   const pageOptions = {
     sizePerPage: 10,
-    totalSize: props.coins.length, // replace later with size(customers),
+    totalSize: coinsShown.length, // replace later with size(customers),
     custom: true,
   }
   const { SearchBar } = Search
+
   return (
     <Card>
       <CardBody>
@@ -173,24 +168,39 @@ const CoinTable = props => {
           pagination={paginationFactory(pageOptions)}
           keyField="coin"
           columns={columns}
-          data={props.coins ?? []}
+          data={coinsShown}
         >
           {({ paginationProps, paginationTableProps }) => (
             <ToolkitProvider
               keyField="coin"
               columns={columns}
-              data={props.coins ?? []}
+              data={coinsShown}
               search
               columnToggle
             >
               {toolkitProps => (
                 <React.Fragment>
-                  <div className="d-flex justify-content-between">
+                  <div className="d-md-flex justify-content-between">
                     <div className="d-inline">
                       <SizePerPageDropdownStandalone {...paginationProps} />
                       <CustomToggleList {...toolkitProps.columnToggleProps} />
                     </div>
-                    <div className="search-box me-2 mb-2 d-inline-block">
+                    <div className="search-box d-md-flex align-items-center">
+                      <div className="form-check form-switch form-switch-md mx-md-4">
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          id="customSwitchsizelg"
+                          defaultChecked
+                          onChange={e => setzeroShow(e.target.checked)}
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="customSwitchsizelg"
+                        >
+                          Show Balance at 0
+                        </label>
+                      </div>
                       <div className="position-relative">
                         <SearchBar {...toolkitProps.searchProps} />
                         <i className="bx bx-search-alt search-icon" />

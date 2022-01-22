@@ -228,13 +228,14 @@ const CrudManualTransaction = props => {
               )}
               <div className="col-sm-6 mt-3">
                 <label>{props.t("On which market?")}</label>
-                <AvField type="select" name="exchange_platform" required>
+                <AvField type="text" name="exchange_platform" required />
+                {/* <AvField type="select" name="exchange_platform" required>
                   <option value="binance">Binance</option>
                   <option value="coinbase">Coinbase</option>
                   <option value="gate_io">Gate.io</option>
                   <option value="ftx">FTX</option>
                   <option value="kraken">Kraken</option>
-                </AvField>
+                </AvField> */}
               </div>
               <div className="col-sm-6 mt-3">
                 <AvField
@@ -269,7 +270,7 @@ const CrudManualTransaction = props => {
                       altFormat: "F j, Y",
                       dateFormat: "Y-m-d",
                     }}
-                    onChange={date => settransactionDate(date)}
+                    onChange={date => settransactionDate(date[0])}
                   />
                   {/* <DatePicker
                     selected={transactionDate}
