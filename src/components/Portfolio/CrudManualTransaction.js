@@ -15,6 +15,7 @@ import ReactSelect from "react-select"
 import { withTranslation } from "react-i18next"
 import { del, get, post } from "../../helpers/api_helper"
 import {
+  loadPortfolio,
   addCustomTransaction,
   updateCustomTransaction,
 } from "../../store/actions"
@@ -31,9 +32,9 @@ const CrudManualTransaction = props => {
   const newTransaction = () => {
     seteditingTransaction(null)
     setDefaultValues({})
-    setcoin("")
-    setcoin_img("")
-    setcoin_label("")
+    setcoin(null)
+    setcoin_img(null)
+    setcoin_label(null)
     setpair_coin("")
     setcoins_list1([])
     setcoins_list2([])
@@ -147,6 +148,11 @@ const CrudManualTransaction = props => {
                   portfolio_id: props.portfolioId,
                 }).then(({ data }) => {
                   props.addCustomTransaction(props.portfolioId, data)
+                  get("load-portfolio-coins/" + props.portfolioId).then(
+                    ({ data }) => {
+                      props.loadPortfolio({ id: props.portfolioId, data })
+                    }
+                  )
                   if (addMore) {
                     newTransaction()
                   }
@@ -176,7 +182,23 @@ const CrudManualTransaction = props => {
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("What do you buy?")}</label>
                     <Select
-                      defaultValue={coins_list1[0] || null}
+                      value={
+                        coin
+                          ? {
+                              value: coin,
+                              label: (
+                                <div>
+                                  <img
+                                    src={coin_img}
+                                    height="30px"
+                                    width="30px"
+                                  />{" "}
+                                  {coin_label}{" "}
+                                </div>
+                              ),
+                            }
+                          : coin
+                      }
                       options={coins_list1}
                       searchUrl="/search/coins?search="
                       afterSearch={data => {
@@ -211,6 +233,13 @@ const CrudManualTransaction = props => {
                             data.map(dat => ({ value: dat, label: dat }))
                           )
                         })
+                      }}
+                      onMenuOpen={() => {
+                        setcoins_list1([])
+                        setcoin(null)
+                        setcoin_label(null)
+                        setcoin_img(null)
+                        setpair_coin("")
                       }}
                     />
                     <AvField type="hidden" name="coin" value={coin} required />
@@ -452,6 +481,7 @@ const mapStateToProps = state => {
 }
 
 export default connect(mapStateToProps, {
+  loadPortfolio,
   addCustomTransaction,
   updateCustomTransaction,
 })(withTranslation()(CrudManualTransaction))

@@ -8,11 +8,11 @@ const Select = props => {
 
   return (
     <ReactSelect
+      {...props}
       isLoading={loading}
       classNamePrefix="select2-selection"
       options={props.options}
       filterOption={() => true}
-      defaultValue={props.defaultValue}
       onInputChange={e => {
         if (e == "") return
         setloading(true)
@@ -26,6 +26,7 @@ const Select = props => {
         }, 2000)
       }}
       onChange={props.onChange}
+      onMenuOpen={props.onMenuOpen}
     />
   )
 }
