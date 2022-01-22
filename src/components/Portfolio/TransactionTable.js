@@ -9,6 +9,7 @@ import {
   DropdownToggle,
   DropdownItem,
   DropdownMenu,
+  Tooltip,
 } from "reactstrap"
 // datatable related plugins
 import { connect } from "react-redux"
@@ -25,6 +26,45 @@ import ToolkitProvider, {
 import { withTranslation } from "react-i18next"
 import moment from "moment"
 import { numberFormatter, moneyFormatter } from "../../helpers/utils"
+
+class TooltipItem extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.toggle = this.toggle.bind(this)
+    this.state = {
+      tooltipOpen: false,
+    }
+  }
+
+  toggle() {
+    this.setState({
+      tooltipOpen: !this.state.tooltipOpen,
+    })
+  }
+
+  render() {
+    return (
+      <span>
+        <button
+          className="mr-1 btn"
+          color="secondary"
+          id={"Tooltip-" + this.props.id}
+        >
+          <i className="bx bx-notepad"></i>
+        </button>
+        <Tooltip
+          placement="bottom"
+          isOpen={this.state.tooltipOpen}
+          target={"Tooltip-" + this.props.id}
+          toggle={this.toggle}
+        >
+          {this.props.content}
+        </Tooltip>
+      </span>
+    )
+  }
+}
 
 const TransactionTable = props => {
   const columns = [
@@ -75,20 +115,23 @@ const TransactionTable = props => {
       dataField: "amount",
       text: props.t("Amount paid"),
       sort: true,
-      formatter: cell => (
-        <span className="text-warning">{moneyFormatter(cell)}</span>
+      formatter: (cell, row) => (
+        <span className="text-warning">
+          {cell + " " + row.pair_coin.split("-")[1]}
+        </span>
       ),
     },
     {
       dataField: "purchase_price",
       text: props.t("Purchase Price"),
       sort: true,
-      formatter: moneyFormatter,
+      formatter: (cell, row) => cell + " " + row.pair_coin.split("-")[1],
     },
     {
       dataField: "fees",
       text: props.t("Fees"),
       sort: true,
+      formatter: (cell, row) => cell + " " + row.pair_coin.split("-")[1],
     },
     {
       dataField: "profit_lose_amount",
@@ -108,33 +151,57 @@ const TransactionTable = props => {
       ),
     },
     {
+      dataField: "note",
+      text: props.t("Note"),
+      hidden: !props.isCustom,
+      formatter: (cell, row, rowIndex) => (
+        <React.Fragment>
+          <TooltipItem content={cell} id={rowIndex}></TooltipItem>
+        </React.Fragment>
+      ),
+    },
+    {
       dataField: "action",
       text: props.t("Action"),
       isDummyField: true,
       hidden: !props.isCustom,
-      formatter: (cell, row) => (
-        <React.Fragment>
-          <UncontrolledDropdown>
-            <DropdownToggle caret tag="button" className="btn">
-              <i className="mdi mdi-dots-horizontal" />
-            </DropdownToggle>
-            <DropdownMenu className={"dropdown-menu-end"} container1="body">
-              <DropdownItem onClick={() => {}}>
-                {props.t("Modify")}
-              </DropdownItem>
-              <React.Fragment>
+      formatter: (cell, row, rowIndex) => {
+        return (
+          <React.Fragment>
+            <UncontrolledDropdown>
+              <DropdownToggle caret tag="button" className="btn">
+                <i className="mdi mdi-dots-horizontal" />
+              </DropdownToggle>
+              <DropdownMenu
+                className={"dropdown-menu-end"}
+                container={
+                  "#transaction-table tr:nth-child(" +
+                  (rowIndex + 1) +
+                  ") td:last-child"
+                }
+                style={{ position: "absolute" }}
+              >
                 <DropdownItem
                   onClick={() => {
-                    props.onDeleteTransaction(row)
+                    props.onModifyTransacion(row)
                   }}
                 >
-                  {props.t("Delete")}
+                  {props.t("Modify")}
                 </DropdownItem>
-              </React.Fragment>
-            </DropdownMenu>
-          </UncontrolledDropdown>
-        </React.Fragment>
-      ),
+                <React.Fragment>
+                  <DropdownItem
+                    onClick={() => {
+                      props.onDeleteTransaction(row)
+                    }}
+                  >
+                    {props.t("Delete")}
+                  </DropdownItem>
+                </React.Fragment>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </React.Fragment>
+        )
+      },
     },
   ]
   const CustomToggleList = ({ columns, onColumnToggle, toggles }) => (
@@ -227,7 +294,7 @@ const TransactionTable = props => {
 
                   <Row>
                     <Col xl="12">
-                      <div className="table-responsive">
+                      <div className="table-responsive" id="transaction-table">
                         <BootstrapTable
                           keyField={"id"}
                           responsive

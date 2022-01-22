@@ -1,7 +1,7 @@
 import React, { useState, useImperativeHandle } from "react"
 import {
   InputGroup,
-  InputGroupAddon,
+  InputGroupText,
   Nav,
   NavItem,
   NavLink,
@@ -11,9 +11,13 @@ import Select from "../Common/Select"
 import Switch from "react-switch"
 import { AvForm, AvField, AvInput } from "availity-reactstrap-validation"
 import { connect } from "react-redux"
+import ReactSelect from "react-select"
 import { withTranslation } from "react-i18next"
 import { del, get, post } from "../../helpers/api_helper"
-import { addCustomTransaction } from "../../store/actions"
+import {
+  addCustomTransaction,
+  updateCustomTransaction,
+} from "../../store/actions"
 
 //Import Flatepicker
 import "flatpickr/dist/themes/material_blue.css"
@@ -21,8 +25,51 @@ import Flatpickr from "react-flatpickr"
 
 const CrudManualTransaction = props => {
   useImperativeHandle(props.refTo, () => {
-    return { setmodal_manual_add_transaction }
+    return { newTransaction, editTransaction }
   })
+
+  const newTransaction = () => {
+    seteditingTransaction(null)
+    setDefaultValues({})
+    setcoin("")
+    setcoin_img("")
+    setcoin_label("")
+    setpair_coin("")
+    setcoins_list1([])
+    setcoins_list2([])
+    settransactionDate("")
+
+    setmodal_manual_add_transaction(true)
+  }
+
+  const editTransaction = tran => {
+    seteditingTransaction(tran.id)
+    setDefaultValues(tran)
+    setcoin(tran.coin)
+    setcoin_img(tran.coin_img)
+    setcoin_label(tran.coin_label)
+    setpair_coin(tran.pair_coin)
+    setcoins_list1([
+      {
+        value: tran.coin,
+        label: (
+          <div>
+            <img src={tran.coin_img} height="30px" width="30px" />{" "}
+            {tran.coin_label}{" "}
+          </div>
+        ),
+      },
+    ])
+    get("search/pairs?coin=" + tran.coin).then(({ data }) => {
+      setpairLoading(false)
+      setcoins_list2(data.map(dat => ({ value: dat, label: dat })))
+    })
+
+    settransactionDate(tran.date)
+    setmodal_manual_add_transaction(true)
+  }
+  const [editingTransaction, seteditingTransaction] = useState(null)
+  const [defaultValues, setDefaultValues] = useState({})
 
   const [modal_manual_add_transaction, setmodal_manual_add_transaction] =
     useState(false)
@@ -38,6 +85,7 @@ const CrudManualTransaction = props => {
   const [coin_label, setcoin_label] = useState("")
   const [coin_img, setcoin_img] = useState("")
   const [transactionDate, settransactionDate] = useState("")
+  const [pairLoading, setpairLoading] = useState(false)
 
   let addMore = false
   return (
@@ -93,16 +141,29 @@ const CrudManualTransaction = props => {
             className="form-horizontal"
             onValidSubmit={(e, v) => {
               setmodal_manual_add_transaction(false)
-              post("create-custom-transaction", {
-                ...v,
-                portfolio_id: props.portfolioId,
-              }).then(({ data }) => {
-                props.addCustomTransaction(props.portfolioId, data)
-                if (addMore) {
-                  setmodal_manual_add_transaction(true)
-                }
-              })
+              if (editingTransaction == null) {
+                post("create-custom-transaction", {
+                  ...v,
+                  portfolio_id: props.portfolioId,
+                }).then(({ data }) => {
+                  props.addCustomTransaction(props.portfolioId, data)
+                  if (addMore) {
+                    newTransaction()
+                  }
+                })
+              } else {
+                post("update-custom-transaction", {
+                  id: editingTransaction,
+                  ...v,
+                }).then(({ data }) => {
+                  props.updateCustomTransaction(props.portfolioId, data)
+                  if (addMore) {
+                    newTransaction()
+                  }
+                })
+              }
             }}
+            model={defaultValues}
           >
             <AvInput
               type="hidden"
@@ -115,6 +176,7 @@ const CrudManualTransaction = props => {
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("What do you buy?")}</label>
                     <Select
+                      defaultValue={coins_list1[0] || null}
                       options={coins_list1}
                       searchUrl="/search/coins?search="
                       afterSearch={data => {
@@ -129,8 +191,7 @@ const CrudManualTransaction = props => {
                                     height="30px"
                                     width="30px"
                                   />{" "}
-                                  {dat.n}{" "}
-                                  <span className="text-muted">{dat.s}</span>
+                                  {dat.n}
                                 </div>
                               ),
                             }
@@ -141,6 +202,15 @@ const CrudManualTransaction = props => {
                         setcoin(value.i)
                         setcoin_label(value.n)
                         setcoin_img(value.ic)
+                        setpairLoading(true)
+                        setpair_coin("Select")
+                        setcoins_list2([])
+                        get("search/pairs?coin=" + value.i).then(({ data }) => {
+                          setpairLoading(false)
+                          setcoins_list2(
+                            data.map(dat => ({ value: dat, label: dat }))
+                          )
+                        })
                       }}
                     />
                     <AvField type="hidden" name="coin" value={coin} required />
@@ -158,31 +228,38 @@ const CrudManualTransaction = props => {
                   </div>
                   <div className="col-sm-6 mt-3">
                     <label>{props.t("With what (pair)?")}</label>
-                    <Select
+                    <ReactSelect
+                      classNamePrefix="select2-selection"
                       options={coins_list2}
-                      searchUrl="/search/coins?search="
-                      afterSearch={data => {
-                        setcoins_list2(
-                          data.map(dat => {
-                            return {
-                              value: dat,
-                              label: (
-                                <div>
-                                  <img
-                                    src={dat.ic}
-                                    height="30px"
-                                    width="30px"
-                                  />{" "}
-                                  {dat.n}{" "}
-                                  <span className="text-muted">{dat.s}</span>
-                                </div>
-                              ),
-                            }
-                          })
-                        )
+                      isLoading={pairLoading}
+                      menuIsOpen={pair_coin == "Select"}
+                      onMenuOpen={() => {
+                        setpair_coin("Select")
                       }}
+                      defaultValue={{ value: pair_coin, label: pair_coin }}
+                      // searchUrl="/search/coins?search="
+                      // afterSearch={data => {
+                      //   setcoins_list2(
+                      //     data.map(dat => {
+                      //       return {
+                      //         value: dat,
+                      //         label: (
+                      //           <div>
+                      //             <img
+                      //               src={dat.ic}
+                      //               height="30px"
+                      //               width="30px"
+                      //             />{" "}
+                      //             {dat.n}{" "}
+                      //             <span className="text-muted">{dat.s}</span>
+                      //           </div>
+                      //         ),
+                      //       }
+                      //     })
+                      //   )
+                      // }}
                       onChange={({ value }) => {
-                        setpair_coin(value.i)
+                        setpair_coin(value)
                       }}
                     />
                     <AvField
@@ -249,14 +326,18 @@ const CrudManualTransaction = props => {
                 <label>{props.t("At what cost?")}</label>
                 <InputGroup>
                   <AvInput name="purchase_price" required />
-                  <InputGroupAddon addonType="append">USD</InputGroupAddon>
+                  <InputGroupText>
+                    {pair_coin.split("-")[1] || "USD"}
+                  </InputGroupText>
                 </InputGroup>
               </div>
               <div className="col-sm-6 mt-3">
                 <label>{props.t("Amount invested?")}</label>
                 <InputGroup>
                   <AvInput name="amount" required />
-                  <InputGroupAddon addonType="append">USD</InputGroupAddon>
+                  <InputGroupText>
+                    {pair_coin.split("-")[1] || "USD"}
+                  </InputGroupText>
                 </InputGroup>
               </div>
               <div className="col-sm-6 mt-3">
@@ -270,6 +351,7 @@ const CrudManualTransaction = props => {
                       altFormat: "F j, Y",
                       dateFormat: "Y-m-d",
                     }}
+                    defaultValue={transactionDate}
                     onChange={date => settransactionDate(date[0])}
                   />
                   {/* <DatePicker
@@ -289,7 +371,9 @@ const CrudManualTransaction = props => {
                 <label>{props.t("Any fees ?")}</label>
                 <InputGroup>
                   <AvInput name="fees" type="text" required />
-                  <InputGroupAddon addonType="append">USD</InputGroupAddon>
+                  <InputGroupText>
+                    {pair_coin.split("-")[1] || "USD"}
+                  </InputGroupText>
                 </InputGroup>
               </div>
               {manual_add_transaction_mode == 1 && (
@@ -369,4 +453,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   addCustomTransaction,
+  updateCustomTransaction,
 })(withTranslation()(CrudManualTransaction))

@@ -7,6 +7,7 @@ import {
   REMOVE_PORTFOLIO,
   UPDATE_PORTFOLIO,
   REMOVE_TRANSACTIONS,
+  UPDATE_CUSTOM_TRANSACTION,
 } from "./actionTypes"
 
 export const addUserExchange = newExchange => {
@@ -18,6 +19,13 @@ export const addUserExchange = newExchange => {
 export const addCustomTransaction = (portfolioId, transaction) => {
   return {
     type: ADD_CUSTOM_TRANSACTION,
+    payload: { id: portfolioId, data: transaction },
+  }
+}
+
+export const updateCustomTransaction = (portfolioId, transaction) => {
+  return {
+    type: UPDATE_CUSTOM_TRANSACTION,
     payload: { id: portfolioId, data: transaction },
   }
 }

@@ -9,23 +9,10 @@ const Select = props => {
   return (
     <ReactSelect
       isLoading={loading}
-      theme={theme => ({
-        ...theme,
-        borderRadius: 0,
-        colors:
-          localStorage.getItem("APP_THEME") == "dark"
-            ? {
-                ...theme.colors,
-                text: "orangered",
-                neutral0: "#32394e",
-                neutral20: "#32394e",
-                neutral30: "var(--input-color)",
-                neutral80: "var(--input-color)",
-              }
-            : { ...theme.colors },
-      })}
+      classNamePrefix="select2-selection"
       options={props.options}
       filterOption={() => true}
+      defaultValue={props.defaultValue}
       onInputChange={e => {
         if (e == "") return
         setloading(true)

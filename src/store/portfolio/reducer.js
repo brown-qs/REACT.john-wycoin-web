@@ -7,6 +7,7 @@ import {
   REMOVE_PORTFOLIO,
   UPDATE_PORTFOLIO,
   REMOVE_TRANSACTIONS,
+  UPDATE_CUSTOM_TRANSACTION,
 } from "./actionTypes"
 
 import toastr from "toastr"
@@ -39,6 +40,20 @@ const portfolio = (state = initialState, action) => {
         exchangeTransactions: newState,
       }
       break
+    case UPDATE_CUSTOM_TRANSACTION: {
+      newState = { ...state.exchangeTransactions }
+      console.log(action.payload)
+      console.log(newState)
+      let index = newState[action.payload.id].findIndex(
+        tr => tr.id == action.payload.data.id
+      )
+      newState[action.payload.id][index] = action.payload.data
+      state = {
+        ...state,
+        exchangeTransactions: newState,
+      }
+      break
+    }
     case LOAD_USER_EXCHANGE:
       state = {
         ...state,

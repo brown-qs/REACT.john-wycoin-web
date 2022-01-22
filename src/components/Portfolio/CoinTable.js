@@ -73,12 +73,17 @@ const CoinTable = props => {
       dataField: "action",
       text: props.t("Action"),
       isDummyField: true,
-      formatter: (cell, row) => (
+      formatter: (cell, row, rowIndex) => (
         <UncontrolledDropdown>
           <DropdownToggle caret tag="button" className="btn">
             <i className="mdi mdi-dots-horizontal" />
           </DropdownToggle>
-          <DropdownMenu className={"dropdown-menu-end"}>
+          <DropdownMenu
+            className={"dropdown-menu-end"}
+            container={
+              "#coin-table tr:nth-child(" + (rowIndex + 1) + ") td:last-child"
+            }
+          >
             <DropdownItem
               onClick={() => {
                 props.onViewTransactions(row.coin)
@@ -210,10 +215,7 @@ const CoinTable = props => {
 
                   <Row>
                     <Col xl="12">
-                      <div
-                        className="table-responsive"
-                        style={{ overflow: "unset" }}
-                      >
+                      <div className="table-responsive" id="coin-table">
                         <BootstrapTable
                           keyField={"coin"}
                           responsive

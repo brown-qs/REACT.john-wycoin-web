@@ -857,7 +857,7 @@ const CrudPortfolio = props => {
             </div>
             <div className="col-2">
               <label>{t("Icon")}</label>
-              <AvField
+              <AvInput
                 name="icon"
                 type="hidden"
                 value={manual_portfolio_icon}

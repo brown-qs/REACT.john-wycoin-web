@@ -297,9 +297,7 @@ const Portfolio = props => {
                             }}
                             onSettransactionAddingPortfolio={() => {
                               settransactionAddingPortfolio(ex.id)
-                              crudManualTransaction.current.setmodal_manual_add_transaction(
-                                true
-                              )
+                              crudManualTransaction.current.newTransaction(true)
                             }}
                             onEdit={() => {
                               crudPortfolio.current.edit_portfolio(ex)
@@ -362,6 +360,10 @@ const Portfolio = props => {
                     onDeleteTransaction={transaction => {
                       setdeletingTransaction(transaction)
                     }}
+                    onModifyTransacion={transaction => {
+                      crudManualTransaction.current.editTransaction(transaction)
+                      settransactionAddingPortfolio(transaction.portfolio_id)
+                    }}
                   />
                 )}
                 {deletingCoin != null ? (
@@ -417,7 +419,7 @@ const Portfolio = props => {
           refTo={crudPortfolio}
           onManualPortfolioCreated={portfolioId => {
             settransactionAddingPortfolio(portfolioId)
-            crudManualTransaction.current.setmodal_manual_add_transaction(true)
+            crudManualTransaction.current.newTransaction(true)
           }}
           onAddPortfolio={portfolioId => {
             toggleExchange(portfolioId)

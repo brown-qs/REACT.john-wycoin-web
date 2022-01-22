@@ -99,7 +99,7 @@
     "react-toastr": "^3.0.0",
     "react-twitter-auth": "0.0.13",
     "react-virtualized": "^9.22.3",
-    "reactstrap": "^6.0.0",
+    "reactstrap": "^9.0.1",
     "recharts": "^2.0.9",
     "redux": "^4.1.0",
     "redux-form": "^8.3.7",
